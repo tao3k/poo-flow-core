@@ -53,11 +53,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          files=(t/core-test.ss t/poo-clos-*-test.ss)
           log="$(mktemp)"
           trap 'rm -f "$log"' EXIT
-          gerbil -:max-heap=1G,debug=q env gxtest "${files[@]}" 2>&1 | tee "$log"
+          gerbil -:max-heap=1G,debug=q test t 2>&1 | tee "$log"
           if grep -E 'ERROR (CHECK|CASE|HARNESS)|Heap overflow|Stack overflow' "$log" >/dev/null; then exit 1; fi
-          for file in "${files[@]}"; do grep -F "MODULE-OK $file" "$log" >/dev/null; done
           grep -F 'HARNESS-OK' "$log" >/dev/null
           grep -x 'OK' "$log" >/dev/null

@@ -19,6 +19,9 @@ contracts directly rather than attributing them to the full POO Flow package.
 =composition/lineage.ss=, =observability/=, and =poo-clos/= live here.
 Extension-graph fixed-point operations and module-schema inheritance/field
 contracts are shared POO mechanisms, not POO Flow Loader policies.
+The reusable native slot Type and Contract descriptors live in
+=module-schema/slot-contracts.ss=; downstream product modules import this Core
+owner directly rather than defining another contract schema.
 Lineage analysis is a pure
 shared kernel; POO Flow retains composition proof facts and module admission.
 The POO-native CLOS runtime and its MOP adapter belong to Core; upstream
