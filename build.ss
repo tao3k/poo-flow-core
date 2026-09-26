@@ -16,4 +16,5 @@
     "module-system/observability/types"
     "module-system/observability/funcs"
     "module-system/observability/slot-debug"
-    "module-system/observability/debug"))
+    "module-system/observability/debug"
+    "module-system/observability/testing-case"))
