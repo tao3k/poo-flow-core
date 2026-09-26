@@ -5,7 +5,7 @@
 
 ;;; POO-native CLOS instance state and generation migration values.
 
-(import (only-in :clan/poo/object .o .ref .slot? object?)
+(import (only-in :clan/poo/object .o .ref .put! .slot? object?)
         (only-in :clan/poo/mop element?)
         (only-in :std/hash/misc hash-ref/default)
         (only-in :std/list/list filter find foldl)
@@ -17,7 +17,7 @@
         class-handler instance-slot-names effective-instance-slot-names
         effective-slot-difference class-slot-difference
         class-effective-slots-at-generation discarded-slot-property-list
-        migrated-instance-storage)
+        migrated-instance-storage snapshot-instance-storage)
 
 ;; : POOObject
 (def ClosInstanceState. (.ref ClosInstanceState 'proto))
@@ -130,3 +130,18 @@
            (hash-put! new-storage slot-name (or old-cell (make-slot-cell))))))
      (poo-clos-class-effective-slots new-class))
     new-storage))
+
+;; The previous change-class view must not share mutable SlotCells with the
+;; current view. Values themselves retain the ordinary shallow-copy semantics.
+;; : (-> ClosInstanceState HashTable)
+(def (snapshot-instance-storage state)
+  (let (snapshot (make-hash-table-eq))
+    (hash-for-each
+     (lambda (slot-name cell)
+       (let (copy (make-slot-cell))
+         (when (.ref cell 'bound?)
+           (.put! copy 'value (.ref cell 'value))
+           (.put! copy 'bound? #t))
+         (hash-put! snapshot slot-name copy)))
+     (.ref state 'storage))
+    snapshot))

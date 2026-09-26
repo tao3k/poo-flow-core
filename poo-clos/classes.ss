@@ -201,8 +201,8 @@
 ;;; instance prototype, and each prototype points back to that exact class
 ;;; metaobject. Projecting upstream C3 preserves identity without a second
 ;;; class graph or linearization algorithm.
-;; : (-> ClosClass [ClosClass])
-(def (compute-class-precedence-list class-value identity-value)
+;; : (-> POOObject Symbol [ClosClass])
+(def (compute-class-precedence-list prototype identity-value)
   (with-catch
    (lambda (failure)
      (if (poo-clos-failure? failure)
@@ -215,19 +215,21 @@
       (lambda (prototype)
         (and (.slot? prototype '%poo-clos-class)
              (.ref prototype '%poo-clos-class)))
-      (compute-precedence-list! (.ref class-value 'instance-prototype))))))
+      (compute-precedence-list! prototype)))))
 
 ;; Each owner index retains its first direct declaration for a slot name.  The
 ;; outer list stays in native C3 order, so option inheritance follows POO.
-;; : (-> ClosClass [Pair])
-(def (class-direct-slot-indexes class-value)
+;; : (-> ClosClass [ClosClass] [ClosDirectSlotDefinition] [Pair])
+(def (class-direct-slot-indexes class-value precedence direct-slots)
   (map
    (lambda (owner-class)
      (cons owner-class
            (poo-clos-leftmost-index-by
             (lambda (slot) (.ref slot 'identity))
-            (.ref owner-class 'direct-slots))))
-   (.ref class-value 'class-precedence-list)))
+            (if (eq? owner-class class-value)
+              direct-slots
+              (.ref owner-class 'direct-slots)))))
+   precedence))
 
 ;; : (-> [Pair] Symbol [Pair])
 (def (slot-descriptions owner-indexes slot-name)
@@ -277,16 +279,20 @@
          storage-class: (car most-specific))
      'invalid-effective-slot-definition)))
 
-;; : (-> ClosClass [ClosEffectiveSlotDefinition])
-(def (compute-effective-slots class-value)
-  (let* ((owner-indexes (class-direct-slot-indexes class-value))
+;; : (-> ClosClass [ClosClass] [ClosDirectSlotDefinition]
+;;        [ClosEffectiveSlotDefinition])
+(def (compute-effective-slots class-value precedence direct-slots)
+  (let* ((owner-indexes
+          (class-direct-slot-indexes class-value precedence direct-slots))
          (slot-names
           (unique/identity
            (flatten1
             (map (lambda (owner-class)
                    (map (lambda (slot) (.ref slot 'identity))
-                        (.ref owner-class 'direct-slots)))
-                 (.ref class-value 'class-precedence-list))))))
+                        (if (eq? owner-class class-value)
+                          direct-slots
+                          (.ref owner-class 'direct-slots))))
+                 precedence)))))
     (map (lambda (slot-name)
            (compute-effective-slot owner-indexes slot-name))
          slot-names)))
@@ -295,7 +301,9 @@
 ;;; existing class-mutation boundaries: construction and redefinition.
 ;; : (-> ClosClass ClosClass)
 (def (refresh-effective-slots! class-value)
-  (let (slots (compute-effective-slots class-value))
+  (let (slots (compute-effective-slots
+              class-value (.ref class-value 'class-precedence-list)
+              (.ref class-value 'direct-slots)))
     (.put! class-value 'effective-slots slots)
     (.put! class-value 'effective-slot-index
            (poo-clos-leftmost-index-by
@@ -395,7 +403,8 @@
             class-storage: (make-hash-table-eq)
             instance-prototype: (make-instance-prototype self)
             class-precedence-list:
-            (compute-class-precedence-list self identity-value)
+            (compute-class-precedence-list
+             (.ref self 'instance-prototype) identity-value)
             class-precedence-index:
             (poo-clos-position-index/identity
              (.ref self 'class-precedence-list))
@@ -416,6 +425,26 @@
 ;;; Common Lisp 4.3.6.  Historical effective-slot projections remain inert
 ;;; layout evidence for lazy instance migration; they are not class objects and
 ;;; cannot participate in dispatch or inheritance.
+;; : (-> ClosClass [ClosClass] [ClosDirectSlotDefinition]
+;;        (values POOObject [ClosClass] HashTable
+;;                [ClosEffectiveSlotDefinition] HashTable))
+(def (project-class-redefinition class-value superclasses direct-slots)
+  ;; Project against a fresh native POO prototype before touching the live
+  ;; class or either parent's dependency edge.
+  (let* ((prototype
+          (instance-prototype-value
+           class-value (map class-instance-prototype superclasses)))
+         (precedence
+          (compute-class-precedence-list
+           prototype (.ref class-value 'identity)))
+         (effective-slots
+          (compute-effective-slots class-value precedence direct-slots)))
+    (values prototype precedence
+            (poo-clos-position-index/identity precedence)
+            effective-slots
+            (poo-clos-leftmost-index-by
+             (lambda (slot) (.ref slot 'identity)) effective-slots))))
+
 ;; : (-> ClosClass [ClosClass] [ClosDirectSlotDefinition] [Pair]
 ;;        (Maybe Procedure) (Maybe Procedure) (Maybe Procedure)
 ;;        (Maybe Procedure) ClosClass)
@@ -428,6 +457,10 @@
         (direct-slot-values (require-direct-slots direct-slot-values))
         (default-initarg-values
          (require-default-initargs default-initarg-values)))
+    (let-values (((prototype precedence precedence-index
+                    effective-slots effective-slot-index)
+                  (project-class-redefinition
+                   class-value superclass-values direct-slot-values)))
     (for-each
      (lambda (superclass)
        (.put! superclass 'direct-subclasses
@@ -448,21 +481,17 @@
     (.put! class-value 'redefinition-update-handler redefinition-handler-value)
     (.put! class-value 'different-class-update-handler different-handler-value)
     (.put! class-value 'generation (+ 1 (.ref class-value 'generation)))
-    (.put! class-value 'instance-prototype
-           (make-instance-prototype class-value))
-    (.put! class-value 'class-precedence-list
-           (compute-class-precedence-list
-            class-value (.ref class-value 'identity)))
-    (.put! class-value 'class-precedence-index
-           (poo-clos-position-index/identity
-            (.ref class-value 'class-precedence-list)))
-    (refresh-effective-slots! class-value)
+    (.put! class-value 'instance-prototype prototype)
+    (.put! class-value 'class-precedence-list precedence)
+    (.put! class-value 'class-precedence-index precedence-index)
+    (.put! class-value 'effective-slots effective-slots)
+    (.put! class-value 'effective-slot-index effective-slot-index)
     (for-each
      (lambda (superclass)
        (.put! superclass 'direct-subclasses
               (cons class-value (.ref superclass 'direct-subclasses))))
      superclass-values)
-    (initialize-direct-class-slots! class-value)))
+    (initialize-direct-class-slots! class-value))))
 
 ;;; The root class contributes no slots; all ordinary classes with an omitted
 ;;; superclass list inherit from this exact class and native POO prototype.

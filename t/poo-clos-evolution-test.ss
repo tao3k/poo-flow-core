@@ -126,21 +126,25 @@
                        (list (poo-clos-class-name
                               (poo-clos-class-of previous))
                              (poo-clos-slot-value previous 'only-a)
+                             (poo-clos-slot-value previous 'common)
                              (poo-clos-class-name
                               (poo-clos-class-of current))
+                             (poo-clos-slot-value current 'common)
                              initargs))
                  current)))
              (instance
               (poo-clos-make-instance class-a common: 4 only-a: 5))
              (identity instance))
-        (check (eq? (poo-clos-change-class instance class-b only-b: 9)
+        (check (eq? (poo-clos-change-class instance class-b
+                                           common: 10 only-b: 9)
                     identity)
                => #t)
         (check-equal? (poo-clos-class-name (poo-clos-class-of instance))
                       'change-b)
-        (check-equal? (poo-clos-slot-value instance 'common) 4)
+        (check-equal? (poo-clos-slot-value instance 'common) 10)
         (check-equal? (poo-clos-slot-value instance 'only-b) 9)
-        (check-equal? receipt '(change-a 5 change-b (only-b: 9)))))
+        (check-equal? receipt
+                      '(change-a 5 4 change-b 10 (common: 10 only-b: 9)))))
 
     (poo-flow-test-case "successive redefinitions retain the exact class object"
       (let* ((class-value (poo-clos-class 'stable-generation))

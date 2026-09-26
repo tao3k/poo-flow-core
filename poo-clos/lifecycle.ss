@@ -409,7 +409,7 @@
                     (class-slot-difference old-class new-class)))
         (let* ((previous-state
                 (instance-state-value old-class (.ref state 'generation)
-                                      (.ref state 'storage)))
+                                      (snapshot-instance-storage state)))
                (previous-value
                 (.o (:: @ (.ref old-class 'instance-prototype))
                     %poo-clos-state: previous-state))

@@ -367,6 +367,30 @@
         (check-equal? (poo-clos-call writer 'new instance-value) 'new)
         (check-equal? (poo-clos-call reader instance-value) 'new)))
 
+    (poo-flow-test-case "rejected C3 redefinition leaves the live class and edges intact"
+      (let* ((x (poo-clos-class 'redefine-precedence-x))
+             (y (poo-clos-class 'redefine-precedence-y))
+             (xy (poo-clos-class 'redefine-precedence-xy
+                                 direct-superclasses: (list x y)))
+             (yx (poo-clos-class 'redefine-precedence-yx
+                                 direct-superclasses: (list y x)))
+             (current (poo-clos-class 'redefine-precedence-current
+                                      direct-superclasses: (list xy)))
+             (prototype (.ref current 'instance-prototype))
+             (generation (poo-clos-class-generation current)))
+        (check-exception
+         (poo-clos-redefine-class current direct-superclasses: (list xy yx))
+         (failure-code? 'inconsistent-class-precedence))
+        (check (eq? (.ref current 'instance-prototype) prototype) => #t)
+        (check-equal? (poo-clos-class-generation current) generation)
+        (check-equal? (class-identities current)
+                      '(redefine-precedence-current redefine-precedence-xy
+                        redefine-precedence-x redefine-precedence-y
+                        standard-object))
+        (check (if (memq current (.ref xy 'direct-subclasses)) #t #f)
+               => #t)
+        (check (memq current (.ref yx 'direct-subclasses)) => #f)))
+
     (poo-flow-test-case "invalid declarations and initialization arguments fail before effects"
       (let (slot (poo-clos-direct-slot-definition 'only initargs: (list only:)))
         (check-exception
