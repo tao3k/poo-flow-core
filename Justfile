@@ -25,4 +25,4 @@ test-file path:
     grep -x 'OK' <<< "$output" >/dev/null
 
 test:
-    just test-file t/foundation-test.ss
+    just test-file t/core-test.ss

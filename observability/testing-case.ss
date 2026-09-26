@@ -7,7 +7,7 @@
 ;;; discovery, assertion semantics, or the gxtest runner.
 (import (only-in :std/test test-case)
         (only-in :clan/poo/object .call .o .ref .slot? object?)
-        (only-in :poo-flow-foundation/module-system/observability/debug
+        (only-in :core/observability/debug
                  poo-flow-debug-memory-policy
                  poo-flow-debug-memory-policy?
                  call-with-poo-flow-debug-memory-case-watchdog))

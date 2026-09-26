@@ -7,14 +7,14 @@
 (import (only-in :std/build-script defbuild-script))
 
 (defbuild-script
-  '("module-system/types"
-    "module-system/object-family/funcs"
-    "module-system/object-family/indexed"
-    "module-system/object-family/syntax"
-    "module-system/object-family/interface"
-    "module-system/composition/lineage"
-    "module-system/observability/types"
-    "module-system/observability/funcs"
-    "module-system/observability/slot-debug"
-    "module-system/observability/debug"
-    "module-system/observability/testing-case"))
+  '("types"
+    "object-family/funcs"
+    "object-family/indexed"
+    "object-family/syntax"
+    "object-family/interface"
+    "composition/lineage"
+    "observability/types"
+    "observability/funcs"
+    "observability/slot-debug"
+    "observability/debug"
+    "observability/testing-case"))
