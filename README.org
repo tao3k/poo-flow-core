@@ -14,8 +14,10 @@ gerbil-poo + ASP Scheme → Foundation → gerbil-parser → POO Flow
 
 The Gerbil module prefix is =poo-flow-foundation=. Consumers import its
 contracts directly rather than attributing them to the full POO Flow package.
-Only =module-system/types.ss=, =object-family/=, and =observability/=
-live here. Full POO Flow must not compile another copy of these module IDs.
+=module-system/types.ss=, =object-family/=, =composition/lineage.ss=, and
+=observability/= live here.  Lineage analysis is a pure shared kernel; POO
+Flow retains composition proof facts and module admission. Full POO Flow must
+not compile another copy of these module IDs.
 
 The Foundation Git revision is pinned by both gerbil-parser and POO Flow.
 POO Flow also carries this repository as a Git submodule for source inspection

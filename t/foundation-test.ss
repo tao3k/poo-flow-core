@@ -12,7 +12,11 @@
                  poo-flow-contract-admit
                  poo-flow-validation-evidence-accepted?)
         (only-in :poo-flow-foundation/module-system/object-family/syntax
-                 defpoo-object-family))
+                 defpoo-object-family)
+        (only-in :poo-flow-foundation/module-system/composition/lineage
+                 poo-flow-lineage-analysis
+                 poo-flow-lineage-cycle?
+                 poo-flow-productive-recursion?))
 (export foundation-test)
 
 (define-type (FoundationNameContract @ PooFlowNativeObjectContract.)
@@ -39,4 +43,15 @@
     (test-case "object-family projection stays POO-native"
       (let (value (.o name: 'foundation))
         (check-equal? (foundation-name value) 'foundation)
-        (check-equal? (foundation->alist value) '((name . foundation)))))))
+        (check-equal? (foundation->alist value) '((name . foundation)))))
+    (test-case "lineage distinguishes cycles and productive recursion"
+      (check-equal? (poo-flow-lineage-cycle? '(a b c)) #f)
+      (check-equal? (poo-flow-lineage-cycle? '(a b a)) #t)
+      (check-equal? (poo-flow-productive-recursion? '(a b a) '(b)) #t)
+      (check-equal? (poo-flow-productive-recursion? '(a b a) '(c)) #f)
+      (check-equal? (.ref (poo-flow-lineage-analysis '(a b c) '(b)) 'status)
+                    'acyclic)
+      (check-equal? (.ref (poo-flow-lineage-analysis '(a b a) '(b)) 'status)
+                    'productive-recursion)
+      (check-equal? (.ref (poo-flow-lineage-analysis '(a b a) '(c)) 'status)
+                    'non-productive-cycle))))
