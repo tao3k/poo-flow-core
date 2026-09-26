@@ -18,7 +18,8 @@ contracts directly rather than attributing them to the full POO Flow package.
 =types.ss=, =object-family/=, =composition/lineage.ss=,
 =observability/=, and =poo-clos/= live here.  Lineage analysis is a pure
 shared kernel; POO Flow retains composition proof facts and module admission.
-The POO-native CLOS runtime and MOP belong to Core; POO Flow retains only its
+The POO-native CLOS runtime and its MOP adapter belong to Core; upstream
+=gerbil-poo= remains the object/MOP authority. POO Flow retains only its
 module declaration and Loader registration. Full POO Flow must not compile
 another copy of these module IDs.
 

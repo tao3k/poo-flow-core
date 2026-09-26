@@ -21,15 +21,6 @@
 
 ;; : POOObject
 (def ClosInstanceState. (.ref ClosInstanceState 'proto))
-;; : POOObject
-(def ClosSlotCell. (.ref ClosSlotCell 'proto))
-
-;; : (-> ClosSlotCell)
-(def (make-slot-cell)
-  (checked ClosSlotCell
-           (.o (:: @ ClosSlotCell.) bound?: #f value: #f)
-           'invalid-slot-cell))
-
 ;; : (-> ClosClass Natural HashTable ClosInstanceState)
 (def (instance-state-value class-value generation-value storage-value)
   (checked ClosInstanceState

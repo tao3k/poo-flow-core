@@ -41,3 +41,10 @@ test:
 # Opt-in wall/user/system timing while preserving the same bounded test path.
 test-profile:
     time just test
+
+# Bounded, opt-in CLOS dispatch profiling outside the unit-test harness.
+benchmark-dispatch:
+    env -u SDKROOT timeout --foreground --signal=TERM --kill-after=5s 120s gerbil {{ gerbil_test_runtime_options }} env gxi t/poo-clos-dispatch-benchmark.ss
+
+benchmark-slot:
+    env -u SDKROOT timeout --foreground --signal=TERM --kill-after=5s 120s gerbil {{ gerbil_test_runtime_options }} env gxi t/poo-clos-slot-benchmark.ss

@@ -58,6 +58,26 @@ POO invocation-frame API for low-level construction, while ordinary
 =next-method-p= bindings over the same runtime object.  There is no second
 evaluator.
 
+* MOP ownership boundary
+
+| Capability | Authoritative implementation | CLOS responsibility |
+|------------+------------------------------+---------------------|
+| Object identity, prototype inheritance, C3 precedence | =clan/poo/object= | Project the native precedence list to the same class metaobjects; never linearize again. |
+| Base Slot lookup, mutation, Type validation and single-dispatch =.defgeneric= | =clan/poo/object= and =clan/poo/mop= | Reuse these primitives for metaobjects and checks; do not clone their slot or single-dispatch engine. |
+| Multi-argument, =eql= and class specializers | Core CLOS | Rank applicable CLOS methods in an immutable generic generation. |
+| =around=/=before=/=after=, next-method and user-defined combinations | Core CLOS | Apply CLOS-specific ordering and invocation contracts absent from upstream MOP. |
+| Unbound/class-allocated slots, initargs, class redefinition and obsolete instances | Core CLOS | Keep the ANSI lifecycle state that base POO slots do not express. |
+
+=mop.ss= is only a checked read-only CLOS capability profile, not a second
+MOP dispatch engine.  Native prototype C3 remains the sole precedence owner.
+
+The opt-in =just benchmark-dispatch= and =just benchmark-slot= receipts isolate
+multi-method selection from bound-slot access.  They are diagnostic, not
+semantic admission gates: any runtime optimization must retain the Core CLOS
+test suite and show an end-to-end call/Slot gain, not merely improve one inner
+projection.  In particular, a per-call prototype-position index was rejected
+because its narrower applicability gain did not improve total wide dispatch.
+
 The closed authoring path is:
 
 #+begin_example

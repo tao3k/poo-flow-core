@@ -21,6 +21,7 @@
         poo-clos-class-effective-slots poo-clos-find-effective-slot
         poo-clos-class-subclass? poo-clos-class-specializer
         poo-clos-class-slot-cell
+        make-slot-cell
         %poo-clos-make-class-generation %poo-clos-reinitialize-class!
         %poo-clos-set-class-name!)
 
