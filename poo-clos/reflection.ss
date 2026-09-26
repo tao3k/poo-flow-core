@@ -31,9 +31,6 @@
         poo-clos-generic-documentation
         poo-clos-generic-function-class poo-clos-generic-method-class)
 
-;; : (forall (a) (-> [a] [a]))
-(def (copy-list values) (map (lambda (value) value) values))
-
 ;; : (-> SchemeValue ClosClass)
 (def (require-class value)
   (unless (element? ClosClass value) (clos-fail 'invalid-class))
@@ -79,19 +76,19 @@
 
 ;; : (-> ClosClass [ClosClass])
 (def (poo-clos-class-direct-superclasses class-value)
-  (copy-list (.ref (require-class class-value) 'direct-superclasses)))
+  (list-copy (.ref (require-class class-value) 'direct-superclasses)))
 
 ;; : (-> ClosClass [ClosClass])
 (def (poo-clos-class-direct-subclasses class-value)
-  (copy-list (.ref (require-class class-value) 'direct-subclasses)))
+  (list-copy (.ref (require-class class-value) 'direct-subclasses)))
 
 ;; : (-> ClosClass [ClosDirectSlotDefinition])
 (def (poo-clos-class-direct-slots class-value)
-  (copy-list (.ref (require-class class-value) 'direct-slots)))
+  (list-copy (.ref (require-class class-value) 'direct-slots)))
 
 ;; : (-> ClosClass [Pair])
 (def (poo-clos-class-default-initargs class-value)
-  (copy-list (.ref (require-class class-value) 'default-initargs)))
+  (list-copy (.ref (require-class class-value) 'default-initargs)))
 
 (def (poo-clos-class-documentation class-value)
   (.ref (require-class class-value) 'documentation))
@@ -119,28 +116,28 @@
 
 ;; : (-> ClosEffectiveSlotDefinition [InitargName])
 (def (poo-clos-slot-initargs slot-value)
-  (copy-list
+  (list-copy
    (.ref (require-metaobject ClosEffectiveSlotDefinition slot-value
                              'invalid-effective-slot-definition)
          'initargs)))
 
 ;; : (-> ClosEffectiveSlotDefinition [Symbol])
 (def (poo-clos-slot-readers slot-value)
-  (copy-list
+  (list-copy
    (.ref (require-metaobject ClosEffectiveSlotDefinition slot-value
                              'invalid-effective-slot-definition)
          'readers)))
 
 ;; : (-> ClosEffectiveSlotDefinition [Symbol])
 (def (poo-clos-slot-writers slot-value)
-  (copy-list
+  (list-copy
    (.ref (require-metaobject ClosEffectiveSlotDefinition slot-value
                              'invalid-effective-slot-definition)
          'writers)))
 
 ;; : (-> ClosEffectiveSlotDefinition [ClosClass])
 (def (poo-clos-slot-defining-classes slot-value)
-  (copy-list
+  (list-copy
    (.ref (require-metaobject ClosEffectiveSlotDefinition slot-value
                              'invalid-effective-slot-definition)
          'defining-classes)))
@@ -174,12 +171,12 @@
                          'qualifier))
     (cond
      ((eq? qualifier 'primary) '())
-     ((list? qualifier) (copy-list qualifier))
+     ((list? qualifier) (list-copy qualifier))
      (else (list qualifier)))))
 
 ;; : (-> ClosMethod [ClosSpecializer])
 (def (poo-clos-method-specializers method-value)
-  (copy-list
+  (list-copy
    (.ref (require-metaobject ClosMethod method-value 'invalid-method)
          'specializers)))
 
@@ -198,7 +195,7 @@
   (let (lambda-list-value
         (poo-clos-method-lambda-list method-value))
     (if lambda-list-value
-      (values (copy-list (.ref lambda-list-value 'keys))
+      (values (list-copy (.ref lambda-list-value 'keys))
               (.ref lambda-list-value 'allow-other-keys?))
       (values '() #f))))
 
@@ -246,7 +243,7 @@
 
 ;; : (-> GenericSource [ClosMethod])
 (def (poo-clos-generic-methods generic-source)
-  (copy-list (.ref (reflection-generic generic-source) 'methods)))
+  (list-copy (.ref (reflection-generic generic-source) 'methods)))
 
 ;; : (-> GenericSource ClosLambdaList)
 (def (poo-clos-generic-lambda-list generic-source)
@@ -254,7 +251,7 @@
 
 ;; : (-> GenericSource [Natural])
 (def (poo-clos-generic-argument-precedence-order generic-source)
-  (copy-list
+  (list-copy
    (.ref (reflection-generic generic-source) 'argument-precedence-order)))
 
 ;; : (-> GenericSource ClosMethodCombination)

@@ -3,6 +3,9 @@
 
 set shell := ["bash", "-euo", "pipefail", "-c"]
 
+# V19 std/make defaults to zero workers unless this is explicitly provided.
+export GERBIL_BUILD_CORES := env_var_or_default("GERBIL_BUILD_CORES", `getconf _NPROCESSORS_ONLN`)
+
 gerbil_test_max_heap := env_var_or_default("GERBIL_TEST_MAX_HEAP", "1G")
 gerbil_test_debug := env_var_or_default("GERBIL_TEST_DEBUG", "q")
 gerbil_test_runtime_options := "-:max-heap=" + gerbil_test_max_heap + ",debug=" + gerbil_test_debug
@@ -48,3 +51,6 @@ benchmark-dispatch:
 
 benchmark-slot:
     env -u SDKROOT timeout --foreground --signal=TERM --kill-after=5s 120s gerbil {{ gerbil_test_runtime_options }} env gxi t/poo-clos-slot-benchmark.ss
+
+benchmark-effective-slots:
+    env -u SDKROOT timeout --foreground --signal=TERM --kill-after=5s 120s gerbil {{ gerbil_test_runtime_options }} env gxi t/poo-clos-effective-slot-benchmark.ss
