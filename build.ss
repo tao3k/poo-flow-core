@@ -12,6 +12,7 @@
     "module-system/object-family/indexed"
     "module-system/object-family/syntax"
     "module-system/object-family/interface"
+    "module-system/composition/lineage"
     "module-system/observability/types"
     "module-system/observability/funcs"
     "module-system/observability/slot-debug"
