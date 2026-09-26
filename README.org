@@ -1,10 +1,31 @@
 #+title: POO Flow Foundation
 
-Minimal native POO contracts used by gerbil-parser and full POO Flow.
+* Purpose
 
-The Gerbil package identity remains =poo-flow= so the public module imports
-retain their existing names. This package owns only the contracts under
-=src/module-system/types.ss=, =object-family/=, and =observability/=.
+This repository owns the minimal POO-native contracts and observability
+modules shared by gerbil-parser and full POO Flow. It is a separate Gerbil
+package to keep the dependency graph acyclic:
 
-Full POO Flow owns higher-level modules and depends on this package and
-gerbil-parser. gerbil-parser depends on this package, not full POO Flow.
+#+begin_example
+gerbil-poo + ASP Scheme → Foundation → gerbil-parser → POO Flow
+#+end_example
+
+* Module ownership
+
+The Gerbil module prefix remains =poo-flow= to preserve the public imports.
+Only =src/module-system/types.ss=, =object-family/=, and =observability/=
+live here. Full POO Flow must not compile another copy of these module IDs.
+
+The Foundation Git revision is pinned by both gerbil-parser and POO Flow.
+POO Flow also carries this repository as a Git submodule for source inspection
+and coordinated development; =gxpkg= installs the package from its own URL.
+
+* Build and test
+
+With Gerbil v0.19 and dependencies installed in an isolated =GERBIL_PATH=:
+
+#+begin_src sh
+gerbil deps --install
+gerbil build
+gerbil -:max-heap=1G,debug=q env gxtest t/foundation-test.ss
+#+end_src
