@@ -15,10 +15,12 @@ gerbil-poo → Core → gerbil-parser → POO Flow
 
 The Gerbil module prefix is =core=. Consumers import its
 contracts directly rather than attributing them to the full POO Flow package.
-=types.ss=, =object-family/=, =composition/lineage.ss=, and
-=observability/= live here.  Lineage analysis is a pure shared kernel; POO
-Flow retains composition proof facts and module admission. Full POO Flow must
-not compile another copy of these module IDs.
+=types.ss=, =object-family/=, =composition/lineage.ss=,
+=observability/=, and =poo-clos/= live here.  Lineage analysis is a pure
+shared kernel; POO Flow retains composition proof facts and module admission.
+The POO-native CLOS runtime and MOP belong to Core; POO Flow retains only its
+module declaration and Loader registration. Full POO Flow must not compile
+another copy of these module IDs.
 
 The =observability/testing-case= module owns the reusable POO Case profile and
 its native =std/test= adapter. Downstream packages extend =memory-policy= and
@@ -34,7 +36,8 @@ The package root is also the module root. No =src/= or =module-system/=
 container is needed inside Core: the top-level directories are the public
 Gerbil module namespaces. Full POO Flow keeps its own =src/module-system/=
 for assembly, loading, profiles, and admission rather than duplicating those
-mechanisms here.
+mechanisms here. Core's CLOS semantic tests run in this package; POO Flow
+keeps the module selection and integration tests.
 
 * Build and test
 
