@@ -116,8 +116,8 @@
         (else #f)))
 
 ;;; Module field types are native gerbil-poo Type descriptors.  The symbol in
-;;; `module-value-kind` is a report-only projection for the upstream harness;
-;;; it never participates in semantic dispatch.
+;;; `module-value-kind` is a report-only projection; native Type owns semantic
+;;; dispatch and admission.
 (def (poo-flow-module-value-type base-type kind)
   (.cc base-type
        'module-value-kind kind
