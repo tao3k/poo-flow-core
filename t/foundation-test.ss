@@ -18,7 +18,8 @@
                  poo-flow-lineage-cycle?
                  poo-flow-productive-recursion?)
         (only-in :poo-flow-foundation/module-system/observability/debug
-                 poo-flow-debug-memory-policy)
+                 poo-flow-debug-memory-policy
+                 poo-flow-debug-memory-snapshot)
         (only-in :poo-flow-foundation/module-system/observability/testing-case
                  poo-flow-default-testing-case-profile
                  poo-flow-testing-case-profile?
@@ -71,6 +72,10 @@
                     'productive-recursion)
       (check-equal? (.ref (poo-flow-lineage-analysis '(a b a) '(c)) 'status)
                     'non-productive-cycle))
+    (test-case "Foundation samples Gambit memory without ASP"
+      (let (sample (poo-flow-debug-memory-snapshot 'foundation/qualification))
+        (check-equal? (.ref sample 'phase) 'foundation/qualification)
+        (check-equal? (exact-integer? (.ref sample 'heap-size-bytes)) #t)))
     (poo-flow-test-case/with +foundation-case-profile+
       "Case profile extends Foundation memory and duration slots"
       (check-equal? (poo-flow-testing-case-profile?

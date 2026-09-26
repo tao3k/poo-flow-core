@@ -10,8 +10,7 @@
         (only-in :clan/poo/mop validate)
         (only-in :clan/poo/support/debug traced-function)
         (only-in :clan/poo/debug DDT trace-poo)
-        (only-in :asp-gerbil-scheme/src/benchmark/memory
-                 benchmark-memory-usage)
+        :gerbil/runtime/gambit
         (only-in :std/error deferror-class)
         (only-in "types.ss"
                  PooFlowDebugMemoryPolicyContract
@@ -252,11 +251,9 @@
       (DDT 'observation poo-flow-observation-summary-sexp summary))
     summary))
 
-;;; This is the only runtime-heap read in the framework. ASP Gerbil Scheme's
-;;; narrow memory library owns the Gambit statistics layout without importing
-;;; the unrelated `std/debug/heap` heap walker. This module consumes only its
-;;; named projection and returns a native POO sample, so callers depend on
-;;; neither private runtime indices nor the library's alist representation.
+;;; This is the only runtime-heap read in the framework. Foundation projects
+;;; the five Gambit process-statistics counters directly into its own POO
+;;; sample; no benchmark or testing package owns this runtime boundary.
 ;; : (-> Symbol collect?: Boolean PooFlowDebugMemorySample)
 ;; poo-flow-debug-memory-snapshot
 ;;   : (-> Symbol collect?: Boolean PooFlowDebugMemorySample)
@@ -275,14 +272,10 @@
 ;;     %
 (def (poo-flow-debug-memory-counters collect?)
   (when collect? (##gc))
-  (let (usage (benchmark-memory-usage))
-    (map (lambda (name)
-           (let (entry (assq name usage))
-             (unless (and entry (exact-integer? (cdr entry)))
-               (error "ASP memory usage omitted a required counter"
-                      name usage))
-             (cdr entry)))
-         '(gc-heap-size gc-alloc gc-live gc-movable gc-still))))
+  (let (stats (##process-statistics))
+    (map (lambda (index)
+           (inexact->exact (f64vector-ref stats index)))
+         '(15 16 17 18 19))))
 
 (def (poo-flow-debug-memory-sample-from-counters phase counters)
     (apply (lambda (heap-size allocation live movable still)

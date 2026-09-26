@@ -7,9 +7,6 @@
 ;;; discovery, assertion semantics, or the gxtest runner.
 (import (only-in :std/test test-case)
         (only-in :clan/poo/object .call .o .ref .slot? object?)
-        (only-in :asp-gerbil-scheme/testing-api
-                 +testing-memory-profile+
-                 testing-memory-profile-max-heap-mib)
         (only-in :poo-flow-foundation/module-system/observability/debug
                  poo-flow-debug-memory-policy
                  poo-flow-debug-memory-policy?
@@ -31,9 +28,7 @@
   (poo-flow-debug-memory-policy
    'testing/default-case
    heap-limit-bytes:
-   (* 1048576
-      (testing-memory-profile-max-heap-mib
-       +testing-memory-profile+))
+   1073741824
    live-growth-limit-bytes: 536870912
    sample-interval-milliseconds: 10))
 
