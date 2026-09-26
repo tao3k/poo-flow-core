@@ -3,6 +3,9 @@
 
 set shell := ["bash", "-euo", "pipefail", "-c"]
 
+# V19 std/make defaults to zero workers unless this is explicitly provided.
+export GERBIL_BUILD_CORES := env_var_or_default("GERBIL_BUILD_CORES", `getconf _NPROCESSORS_ONLN`)
+
 gerbil_test_max_heap := env_var_or_default("GERBIL_TEST_MAX_HEAP", "1G")
 gerbil_test_debug := env_var_or_default("GERBIL_TEST_DEBUG", "q")
 gerbil_test_runtime_options := "-:max-heap=" + gerbil_test_max_heap + ",debug=" + gerbil_test_debug
@@ -17,12 +20,37 @@ test-file path:
     #!/usr/bin/env bash
     set -euo pipefail
     test -f "{{ path }}"
-    output="$(env -u SDKROOT timeout --foreground --signal=TERM --kill-after=5s 120s gerbil {{ gerbil_test_runtime_options }} env gxtest "{{ path }}" 2>&1)" || { status=$?; printf '%s\n' "$output"; exit "$status"; }
-    printf '%s\n' "$output"
-    if grep -E 'ERROR (CHECK|CASE|HARNESS)|Heap overflow|Stack overflow' <<< "$output" >/dev/null; then exit 1; fi
-    grep -F 'MODULE-OK {{ path }}' <<< "$output" >/dev/null
-    grep -F 'HARNESS-OK' <<< "$output" >/dev/null
-    grep -x 'OK' <<< "$output" >/dev/null
+    log="$(mktemp)"
+    trap 'rm -f "$log"' EXIT
+    env -u SDKROOT timeout --foreground --signal=TERM --kill-after=5s 120s gerbil {{ gerbil_test_runtime_options }} env gxtest "{{ path }}" 2>&1 | tee "$log"
+    if grep -E 'ERROR (CHECK|CASE|HARNESS)|Heap overflow|Stack overflow' "$log" >/dev/null; then exit 1; fi
+    grep -F 'MODULE-OK {{ path }}' "$log" >/dev/null
+    grep -F 'HARNESS-OK' "$log" >/dev/null
+    grep -x 'OK' "$log" >/dev/null
 
+# One native harness amortizes Gerbil startup and module loading across files.
 test:
-    just test-file t/core-test.ss
+    #!/usr/bin/env bash
+    set -euo pipefail
+    files=(t/core-test.ss t/poo-clos-*-test.ss)
+    log="$(mktemp)"
+    trap 'rm -f "$log"' EXIT
+    env -u SDKROOT timeout --foreground --signal=TERM --kill-after=5s 120s gerbil {{ gerbil_test_runtime_options }} env gxtest "${files[@]}" 2>&1 | tee "$log"
+    if grep -E 'ERROR (CHECK|CASE|HARNESS)|Heap overflow|Stack overflow' "$log" >/dev/null; then exit 1; fi
+    for file in "${files[@]}"; do grep -F "MODULE-OK $file" "$log" >/dev/null; done
+    grep -F 'HARNESS-OK' "$log" >/dev/null
+    grep -x 'OK' "$log" >/dev/null
+
+# Opt-in wall/user/system timing while preserving the same bounded test path.
+test-profile:
+    time just test
+
+# Bounded, opt-in CLOS dispatch profiling outside the unit-test harness.
+benchmark-dispatch:
+    env -u SDKROOT timeout --foreground --signal=TERM --kill-after=5s 120s gerbil {{ gerbil_test_runtime_options }} env gxi t/poo-clos-dispatch-benchmark.ss
+
+benchmark-slot:
+    env -u SDKROOT timeout --foreground --signal=TERM --kill-after=5s 120s gerbil {{ gerbil_test_runtime_options }} env gxi t/poo-clos-slot-benchmark.ss
+
+benchmark-effective-slots:
+    env -u SDKROOT timeout --foreground --signal=TERM --kill-after=5s 120s gerbil {{ gerbil_test_runtime_options }} env gxi t/poo-clos-effective-slot-benchmark.ss
