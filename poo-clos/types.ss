@@ -336,7 +336,7 @@
                       string-or-false? any-value?))))
 
 ;;; Class metaobjects own lazy native prototypes and class-allocated storage;
-;;; they do not replace gerbil-poo's inheritance or C3 implementation.
+;;; they do not replace gerbil-poo's inheritance or C4 implementation.
 (define-type (ClosClass @ ClosType.)
   proto: (clos-prototype ClosClass 'poo-clos/class)
   .element?: clos-class-element?)

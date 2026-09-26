@@ -40,7 +40,7 @@
                     class-value)
                => #t)))
 
-    (poo-flow-test-case "native POO C3 closes a diamond and effective slot options merge"
+    (poo-flow-test-case "native POO C4 closes a diamond and effective slot options merge"
       (let* ((root-slot
               (poo-clos-direct-slot-definition
                'payload initargs: (list root:)
@@ -72,9 +72,9 @@
         (check-equal? (poo-clos-slot-value instance-value 'payload) 'right)
         (check (poo-clos-class-subclass? leaf root) => #t)))
 
-    (poo-flow-test-case "native POO C3 preserves monotonic pedalo precedence"
+    (poo-flow-test-case "native POO C4 preserves monotonic pedalo precedence"
       ;; Barrett et al., figure 2, separates the historical ANSI topological
-      ;; order from C3. POO CLOS intentionally follows upstream prototype
+      ;; order from C4. POO CLOS intentionally follows upstream prototype
       ;; linearization, so day-boat remains before wheel-boat in pedalo.
       (let* ((boat (poo-clos-class 'boat))
              (day-boat
@@ -367,7 +367,7 @@
         (check-equal? (poo-clos-call writer 'new instance-value) 'new)
         (check-equal? (poo-clos-call reader instance-value) 'new)))
 
-    (poo-flow-test-case "rejected C3 redefinition leaves the live class and edges intact"
+    (poo-flow-test-case "rejected C4 redefinition leaves the live class and edges intact"
       (let* ((x (poo-clos-class 'redefine-precedence-x))
              (y (poo-clos-class 'redefine-precedence-y))
              (xy (poo-clos-class 'redefine-precedence-xy
@@ -431,7 +431,7 @@
                                  direct-superclasses: (list x y)))
              (yx (poo-clos-class 'precedence-yx
                                  direct-superclasses: (list y x))))
-        ;; Upstream POO remains the sole C3 owner. The public CLOS boundary
+        ;; Upstream POO remains the sole C4 owner. The public CLOS boundary
         ;; translates its rejection without recomputing precedence.
         (check-exception
          (poo-clos-class 'inconsistent

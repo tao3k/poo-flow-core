@@ -154,6 +154,25 @@
         (check (eq? first second) => #t)
         (check-equal? (poo-clos-class-generation class-value) 2)))
 
+    (poo-flow-test-case "dependent C4 rejection preserves every class generation"
+      (let* ((x (poo-clos-class 'dependent-precedence-x))
+             (y (poo-clos-class 'dependent-precedence-y))
+             (base (poo-clos-class 'dependent-precedence-base
+                                   direct-superclasses: (list x)))
+             (child (poo-clos-class 'dependent-precedence-child
+                                    direct-superclasses: (list y base)))
+             (base-prototype (.ref base 'instance-prototype))
+             (child-prototype (.ref child 'instance-prototype)))
+        (check-exception
+         (poo-clos-redefine-class base direct-superclasses: (list x y))
+         (failure-code? 'inconsistent-class-precedence))
+        (check-equal? (map poo-clos-class-generation (list base child))
+                      '(0 0))
+        (check (eq? (.ref base 'instance-prototype) base-prototype) => #t)
+        (check (eq? (.ref child 'instance-prototype) child-prototype) => #t)
+        (check (eq? (car (poo-clos-class-direct-superclasses base)) x) => #t)
+        (check (memq base (.ref y 'direct-subclasses)) => #f)))
+
     (poo-flow-test-case "diamond dependents are reinitialized exactly once"
       (let* ((root (poo-clos-class 'evolution-diamond-root))
              (left
@@ -176,7 +195,7 @@
     (poo-flow-test-case "MOP-EXTENDED is a sealed read-only capability profile"
       (let (profile (poo-clos-mop-extended-profile))
         (check (poo-clos-mop-profile-admits? profile 'generic-methods) => #t)
-        (check (poo-clos-mop-profile-admits? profile 'replace-native-c3)
+        (check (poo-clos-mop-profile-admits? profile 'replace-native-c4)
                => #f)
         (check-equal? (.ref profile 'status) 'admitted)
         (check-equal? (.ref profile 'sealed?) #t)))

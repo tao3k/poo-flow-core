@@ -55,7 +55,7 @@
          update-instance-for-different-class slot-missing slot-unbound)
        sealed?: #t
        documentation:
-       "Portable read-only MOP subset; native POO owns C3 and metaobject identity")
+       "Portable read-only MOP subset; native POO owns C4 and metaobject identity")
    'invalid-mop-profile))
 
 ;; : (-> ClosMopProfile Symbol Boolean)

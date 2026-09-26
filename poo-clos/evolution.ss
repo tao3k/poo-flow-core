@@ -51,6 +51,36 @@
   (if (and root? (not (eq? supplied +poo-clos-unspecified+)))
     supplied fallback))
 
+;;; Stage all dependent native C4 projections before the first live mutation.
+;;; The tables only connect candidate prototypes and declarations; the upstream
+;;; POO linearizer still owns the order and rejection decision.
+;; : (-> [ClosClass] ClosClass SchemeValue SchemeValue [Pair])
+(def (preflight-dependent-projections classes root supers slots)
+  (let ((prototypes (make-hash-table-eq))
+        (direct-slots (make-hash-table-eq)))
+    (map
+     (lambda (current)
+       (let* ((root? (eq? current root))
+              (selected-supers
+               (map poo-clos-resolve-class
+                    (redefinition-option
+                     root? supers (.ref current 'direct-superclasses))))
+              (selected-slots
+               (redefinition-option root? slots (.ref current 'direct-slots))))
+         (hash-put! direct-slots current selected-slots)
+         (let (projection
+               (%poo-clos-project-class-redefinition
+                current selected-supers
+                (lambda (owner)
+                  (or (hash-get prototypes owner)
+                      (.ref owner 'instance-prototype)))
+                (lambda (owner)
+                  (or (hash-get direct-slots owner)
+                      (.ref owner 'direct-slots)))))
+           (hash-put! prototypes current (.ref projection 'prototype))
+           (cons current projection))))
+     classes)))
+
 ;; | ClosClass = POOObject
 ;; poo-clos-redefine-class
 ;;   : (-> ClosClass direct-superclasses: [ClosClass]
@@ -84,26 +114,32 @@
       different-class-update-handler: (different-handler
                                        +poo-clos-unspecified+))
   (unless (element? ClosClass class-value) (clos-fail 'invalid-class))
-  (for-each
-   (lambda (current)
-     (let (root? (eq? current class-value))
-       (%poo-clos-reinitialize-class!
-        current
-        (map poo-clos-resolve-class
-             (redefinition-option
-              root? supers (.ref current 'direct-superclasses)))
-        (redefinition-option root? slots (.ref current 'direct-slots))
-        (redefinition-option
-         root? defaults (.ref current 'default-initargs))
-        (redefinition-option
-         root? slot-missing (.ref current 'slot-missing-handler))
-        (redefinition-option
-         root? slot-unbound (.ref current 'slot-unbound-handler))
-        (redefinition-option
-         root? redefinition-handler (.ref current 'redefinition-update-handler))
-        (redefinition-option
-         root? different-handler (.ref current 'different-class-update-handler)))))
-   (sort-by-depth (dependent-closure class-value)))
+  (let* ((classes (sort-by-depth (dependent-closure class-value)))
+         (projections
+          (preflight-dependent-projections
+           classes class-value supers slots)))
+    (for-each
+     (lambda (current+projection)
+       (let* ((current (car current+projection))
+              (root? (eq? current class-value)))
+         (%poo-clos-reinitialize-class!
+          current
+          (map poo-clos-resolve-class
+               (redefinition-option
+                root? supers (.ref current 'direct-superclasses)))
+          (redefinition-option root? slots (.ref current 'direct-slots))
+          (redefinition-option
+           root? defaults (.ref current 'default-initargs))
+          (redefinition-option
+           root? slot-missing (.ref current 'slot-missing-handler))
+          (redefinition-option
+           root? slot-unbound (.ref current 'slot-unbound-handler))
+          (redefinition-option
+           root? redefinition-handler (.ref current 'redefinition-update-handler))
+          (redefinition-option
+           root? different-handler (.ref current 'different-class-update-handler))
+          projection: (cdr current+projection))))
+     projections))
   class-value)
 
 ;; : (-> ClosClass ClosClass)

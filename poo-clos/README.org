@@ -9,7 +9,7 @@
 Core owns this POO-native CLOS metaprotocol extension.  The Common
 Lisp HyperSpec supplies semantic conformance vectors, but it does not own the
 runtime architecture.  Class precedence is the upstream Gerbil POO prototype
-C3, projected back to the exact CLOS class metaobjects.  POO Flow owns its
+C4, projected back to the exact CLOS class metaobjects.  POO Flow owns its
 lightweight module descriptor and Loader selection; the Core CLOS runtime
 facade remains lazy and opt-in.
 
@@ -24,7 +24,7 @@ The implementation provides:
 - lexical next-method checks, including replacement-argument applicability.
 - POO-native class, direct-slot, effective-slot, instance-state, and slot-cell
   metaobjects;
-- native POO C3 class precedence with diamond, monotonicity, and upstream
+- native POO C4 class precedence with diamond, monotonicity, and upstream
   inconsistency handling;
 - instance- and class-allocated slots, inherited option merging, initforms,
   initargs, default initargs, and shared initialization;
@@ -62,14 +62,14 @@ evaluator.
 
 | Capability | Authoritative implementation | CLOS responsibility |
 |------------+------------------------------+---------------------|
-| Object identity, prototype inheritance, C3 precedence | =clan/poo/object= | Project the native precedence list to the same class metaobjects; never linearize again. |
+| Object identity, prototype inheritance, C4 precedence | =clan/poo/object= | Project the native precedence list to the same class metaobjects; never linearize again. |
 | Base Slot lookup, mutation, Type validation and single-dispatch =.defgeneric= | =clan/poo/object= and =clan/poo/mop= | Reuse these primitives for metaobjects and checks; do not clone their slot or single-dispatch engine. |
 | Multi-argument, =eql= and class specializers | Core CLOS | Rank applicable CLOS methods in an immutable generic generation. |
 | =around=/=before=/=after=, next-method and user-defined combinations | Core CLOS | Apply CLOS-specific ordering and invocation contracts absent from upstream MOP. |
 | Unbound/class-allocated slots, initargs, class redefinition and obsolete instances | Core CLOS | Keep the ANSI lifecycle state that base POO slots do not express. |
 
 =mop.ss= is only a checked read-only CLOS capability profile, not a second
-MOP dispatch engine.  Native prototype C3 remains the sole precedence owner.
+MOP dispatch engine.  Native prototype C4 remains the sole precedence owner.
 
 The opt-in =just benchmark-dispatch= and =just benchmark-slot= receipts isolate
 multi-method selection from bound-slot access.  They are diagnostic, not
@@ -92,7 +92,7 @@ upstream =compute-precedence-list!= result back to its exact class metaobjects.
 =funcs.ss= retains only CLOS-owned indexing mechanics and reuses Gerbil std
 =invert-hash<-vector= for position indexes and =stable-sort= for method
 ordering.  The 40-sample Scenario under
-=t/scenarios/performance/poo-clos-native-c3/= checks native order and =eq?=
+=t/scenarios/performance/poo-clos-native-c4/= checks native order and =eq?=
 metaobject identity while recording construction and warm-query latency.
 
 * Scheme and POO adaptations

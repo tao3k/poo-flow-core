@@ -171,7 +171,7 @@
            'invalid-specializer))
 
 ;;; Native POO prototype dispatch is explicit instead of overloading class
-;;; terminology.  Applicability follows the prototype's native C3 ancestry;
+;;; terminology.  Applicability follows the prototype's native C4 ancestry;
 ;;; no shadow hierarchy or marker CLOS class is introduced.
 ;; : (-> POOObject ClosSpecializer)
 (def (poo-clos-prototype-specializer prototype-value)

@@ -23,6 +23,7 @@
         poo-clos-class-slot-cell
         make-slot-cell
         %poo-clos-make-class-generation %poo-clos-reinitialize-class!
+        %poo-clos-project-class-redefinition
         %poo-clos-set-class-name!)
 
 ;; : POOObject
@@ -199,7 +200,7 @@
 
 ;;; Native POO is the sole precedence owner. Every class generation owns one
 ;;; instance prototype, and each prototype points back to that exact class
-;;; metaobject. Projecting upstream C3 preserves identity without a second
+;;; metaobject. Projecting upstream C4 preserves identity without a second
 ;;; class graph or linearization algorithm.
 ;; : (-> POOObject Symbol [ClosClass])
 (def (compute-class-precedence-list prototype identity-value)
@@ -218,17 +219,15 @@
       (compute-precedence-list! prototype)))))
 
 ;; Each owner index retains its first direct declaration for a slot name.  The
-;; outer list stays in native C3 order, so option inheritance follows POO.
-;; : (-> ClosClass [ClosClass] [ClosDirectSlotDefinition] [Pair])
-(def (class-direct-slot-indexes class-value precedence direct-slots)
+;; outer list stays in native C4 order, so option inheritance follows POO.
+;; : (-> [ClosClass] Procedure [Pair])
+(def (class-direct-slot-indexes precedence direct-slots-for)
   (map
    (lambda (owner-class)
      (cons owner-class
            (poo-clos-leftmost-index-by
             (lambda (slot) (.ref slot 'identity))
-            (if (eq? owner-class class-value)
-              direct-slots
-              (.ref owner-class 'direct-slots)))))
+            (direct-slots-for owner-class))))
    precedence))
 
 ;; : (-> [Pair] Symbol [Pair])
@@ -279,19 +278,17 @@
          storage-class: (car most-specific))
      'invalid-effective-slot-definition)))
 
-;; : (-> ClosClass [ClosClass] [ClosDirectSlotDefinition]
+;; : (-> [ClosClass] Procedure
 ;;        [ClosEffectiveSlotDefinition])
-(def (compute-effective-slots class-value precedence direct-slots)
+(def (compute-effective-slots precedence direct-slots-for)
   (let* ((owner-indexes
-          (class-direct-slot-indexes class-value precedence direct-slots))
+          (class-direct-slot-indexes precedence direct-slots-for))
          (slot-names
           (unique/identity
            (flatten1
             (map (lambda (owner-class)
                    (map (lambda (slot) (.ref slot 'identity))
-                        (if (eq? owner-class class-value)
-                          direct-slots
-                          (.ref owner-class 'direct-slots))))
+                        (direct-slots-for owner-class)))
                  precedence)))))
     (map (lambda (slot-name)
            (compute-effective-slot owner-indexes slot-name))
@@ -302,8 +299,8 @@
 ;; : (-> ClosClass ClosClass)
 (def (refresh-effective-slots! class-value)
   (let (slots (compute-effective-slots
-              class-value (.ref class-value 'class-precedence-list)
-              (.ref class-value 'direct-slots)))
+              (.ref class-value 'class-precedence-list)
+              (lambda (owner) (.ref owner 'direct-slots))))
     (.put! class-value 'effective-slots slots)
     (.put! class-value 'effective-slot-index
            (poo-clos-leftmost-index-by
@@ -359,7 +356,7 @@
 ;;       ```
 ;;
 ;;       result: a complete class generation whose class and slot precedence
-;;       are projected from its native POO prototype C3.
+;;       are projected from its native POO prototype C4.
 ;;     %
 (def (%poo-clos-make-class-generation
       identity-value superclass-values direct-slot-values
@@ -425,25 +422,26 @@
 ;;; Common Lisp 4.3.6.  Historical effective-slot projections remain inert
 ;;; layout evidence for lazy instance migration; they are not class objects and
 ;;; cannot participate in dispatch or inheritance.
-;; : (-> ClosClass [ClosClass] [ClosDirectSlotDefinition]
-;;        (values POOObject [ClosClass] HashTable
-;;                [ClosEffectiveSlotDefinition] HashTable))
-(def (project-class-redefinition class-value superclasses direct-slots)
+;; : (-> ClosClass [ClosClass] Procedure Procedure POOObject)
+(def (%poo-clos-project-class-redefinition
+      class-value superclasses prototype-for direct-slots-for)
   ;; Project against a fresh native POO prototype before touching the live
   ;; class or either parent's dependency edge.
-  (let* ((prototype
+  (let* ((prototype-value
           (instance-prototype-value
-           class-value (map class-instance-prototype superclasses)))
-         (precedence
+           class-value (map prototype-for superclasses)))
+         (precedence-value
           (compute-class-precedence-list
-           prototype (.ref class-value 'identity)))
-         (effective-slots
-          (compute-effective-slots class-value precedence direct-slots)))
-    (values prototype precedence
-            (poo-clos-position-index/identity precedence)
-            effective-slots
-            (poo-clos-leftmost-index-by
-             (lambda (slot) (.ref slot 'identity)) effective-slots))))
+           prototype-value (.ref class-value 'identity)))
+         (effective-slots-value
+          (compute-effective-slots precedence-value direct-slots-for)))
+    (.o prototype: prototype-value
+        precedence: precedence-value
+        precedence-index: (poo-clos-position-index/identity precedence-value)
+        effective-slots: effective-slots-value
+        effective-slot-index:
+        (poo-clos-leftmost-index-by
+         (lambda (slot) (.ref slot 'identity)) effective-slots-value))))
 
 ;; : (-> ClosClass [ClosClass] [ClosDirectSlotDefinition] [Pair]
 ;;        (Maybe Procedure) (Maybe Procedure) (Maybe Procedure)
@@ -451,47 +449,54 @@
 (def (%poo-clos-reinitialize-class!
       class-value superclass-values direct-slot-values default-initarg-values
       slot-missing-handler-value slot-unbound-handler-value
-      redefinition-handler-value different-handler-value)
+      redefinition-handler-value different-handler-value
+      projection: (prepared-projection #f))
   (unless (element? ClosClass class-value) (clos-fail 'invalid-class))
   (let ((superclass-values (require-direct-superclasses superclass-values))
         (direct-slot-values (require-direct-slots direct-slot-values))
         (default-initarg-values
          (require-default-initargs default-initarg-values)))
-    (let-values (((prototype precedence precedence-index
-                    effective-slots effective-slot-index)
-                  (project-class-redefinition
-                   class-value superclass-values direct-slot-values)))
-    (for-each
-     (lambda (superclass)
-       (.put! superclass 'direct-subclasses
-              (filter (lambda (candidate) (not (eq? candidate class-value)))
-                      (.ref superclass 'direct-subclasses))))
-     (.ref class-value 'direct-superclasses))
-    (let ((old-generation (.ref class-value 'generation))
-          (old-effective-slots (.ref class-value 'effective-slots)))
-      (.put! class-value 'layout-history
-             (cons (.o generation: old-generation
-                       effective-slots: old-effective-slots)
-                   (.ref class-value 'layout-history))))
-    (.put! class-value 'direct-superclasses superclass-values)
-    (.put! class-value 'direct-slots direct-slot-values)
-    (.put! class-value 'default-initargs default-initarg-values)
-    (.put! class-value 'slot-missing-handler slot-missing-handler-value)
-    (.put! class-value 'slot-unbound-handler slot-unbound-handler-value)
-    (.put! class-value 'redefinition-update-handler redefinition-handler-value)
-    (.put! class-value 'different-class-update-handler different-handler-value)
-    (.put! class-value 'generation (+ 1 (.ref class-value 'generation)))
-    (.put! class-value 'instance-prototype prototype)
-    (.put! class-value 'class-precedence-list precedence)
-    (.put! class-value 'class-precedence-index precedence-index)
-    (.put! class-value 'effective-slots effective-slots)
-    (.put! class-value 'effective-slot-index effective-slot-index)
-    (for-each
-     (lambda (superclass)
-       (.put! superclass 'direct-subclasses
-              (cons class-value (.ref superclass 'direct-subclasses))))
-     superclass-values)
-    (initialize-direct-class-slots! class-value))))
+    (let (projection
+          (or prepared-projection
+              (%poo-clos-project-class-redefinition
+               class-value superclass-values class-instance-prototype
+               (lambda (owner)
+                 (if (eq? owner class-value)
+                   direct-slot-values
+                   (.ref owner 'direct-slots))))))
+      (for-each
+       (lambda (superclass)
+         (.put! superclass 'direct-subclasses
+                (filter (lambda (candidate) (not (eq? candidate class-value)))
+                        (.ref superclass 'direct-subclasses))))
+       (.ref class-value 'direct-superclasses))
+      (let ((old-generation (.ref class-value 'generation))
+            (old-effective-slots (.ref class-value 'effective-slots)))
+        (.put! class-value 'layout-history
+               (cons (.o generation: old-generation
+                         effective-slots: old-effective-slots)
+                     (.ref class-value 'layout-history))))
+      (.put! class-value 'direct-superclasses superclass-values)
+      (.put! class-value 'direct-slots direct-slot-values)
+      (.put! class-value 'default-initargs default-initarg-values)
+      (.put! class-value 'slot-missing-handler slot-missing-handler-value)
+      (.put! class-value 'slot-unbound-handler slot-unbound-handler-value)
+      (.put! class-value 'redefinition-update-handler redefinition-handler-value)
+      (.put! class-value 'different-class-update-handler different-handler-value)
+      (.put! class-value 'generation (+ 1 (.ref class-value 'generation)))
+      (.put! class-value 'instance-prototype (.ref projection 'prototype))
+      (.put! class-value 'class-precedence-list (.ref projection 'precedence))
+      (.put! class-value 'class-precedence-index
+             (.ref projection 'precedence-index))
+      (.put! class-value 'effective-slots (.ref projection 'effective-slots))
+      (.put! class-value 'effective-slot-index
+             (.ref projection 'effective-slot-index))
+      (for-each
+       (lambda (superclass)
+         (.put! superclass 'direct-subclasses
+                (cons class-value (.ref superclass 'direct-subclasses))))
+       superclass-values)
+      (initialize-direct-class-slots! class-value))))
 
 ;;; The root class contributes no slots; all ordinary classes with an omitted
 ;;; superclass list inherit from this exact class and native POO prototype.
