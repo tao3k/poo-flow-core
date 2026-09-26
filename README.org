@@ -1,0 +1,10 @@
+#+title: POO Flow Foundation
+
+Minimal native POO contracts used by gerbil-parser and full POO Flow.
+
+The Gerbil package identity remains =poo-flow= so the public module imports
+retain their existing names. This package owns only the contracts under
+=src/module-system/types.ss=, =object-family/=, and =observability/=.
+
+Full POO Flow owns higher-level modules and depends on this package and
+gerbil-parser. gerbil-parser depends on this package, not full POO Flow.
