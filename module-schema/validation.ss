@@ -16,6 +16,7 @@
         poo-flow-module-field-contract-validation-kind
         poo-flow-module-field-contract-validation
         poo-flow-module-field-contract-validation-valid?
+        poo-flow-module-object-inheritance-chain
         poo-flow-module-object-validation
         poo-flow-module-object-validation?
         poo-flow-module-object-validation-valid?
@@ -87,6 +88,10 @@
 
 (def (module-schema-field-identities fields)
   (map poo-flow-module-field-contract-identity fields))
+
+(def (poo-flow-module-object-inheritance-chain schema-object)
+  (map poo-flow-module-object-identity
+       (compute-precedence-list! schema-object)))
 
 (def (module-schema-duplicate-identities identities)
   (let ((seen (make-hash-table))
@@ -162,7 +167,8 @@
         object: (poo-flow-module-object-identity schema-object)
         inherits: (map poo-flow-module-object-identity
                        (poo-flow-module-object-inherits schema-object))
-        inheritance-chain: (map poo-flow-module-object-identity precedence)
+        inheritance-chain: (poo-flow-module-object-inheritance-chain
+                            schema-object)
         inherit-count: (length (poo-flow-module-object-inherits schema-object))
         direct-field-count: (length direct-fields)
         direct-field-identities: direct-identities
