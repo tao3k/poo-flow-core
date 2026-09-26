@@ -40,4 +40,4 @@ test:
 
 # Opt-in wall/user/system timing while preserving the same bounded test path.
 test-profile:
-    /usr/bin/time -p just test
+    time just test
