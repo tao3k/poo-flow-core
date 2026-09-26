@@ -53,7 +53,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          files=(t/core-test.ss t/poo-clos-*-test.ss)
+          files=(t/core-test.ss t/poo-clos-*-test.ss t/extension-graph-*-test.ss t/module-schema-*-test.ss)
           log="$(mktemp)"
           trap 'rm -f "$log"' EXIT
           gerbil -:max-heap=1G,debug=q env gxtest "${files[@]}" 2>&1 | tee "$log"
