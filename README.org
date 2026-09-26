@@ -12,8 +12,9 @@ gerbil-poo + ASP Scheme → Foundation → gerbil-parser → POO Flow
 
 * Module ownership
 
-The Gerbil module prefix remains =poo-flow= to preserve the public imports.
-Only =src/module-system/types.ss=, =object-family/=, and =observability/=
+The Gerbil module prefix is =poo-flow-foundation=. Consumers import its
+contracts directly rather than attributing them to the full POO Flow package.
+Only =module-system/types.ss=, =object-family/=, and =observability/=
 live here. Full POO Flow must not compile another copy of these module IDs.
 
 The Foundation Git revision is pinned by both gerbil-parser and POO Flow.
@@ -27,5 +28,5 @@ With Gerbil v0.19 and dependencies installed in an isolated =GERBIL_PATH=:
 #+begin_src sh
 gerbil deps --install
 gerbil build
-gerbil -:max-heap=1G,debug=q env gxtest t/foundation-test.ss
+just test
 #+end_src

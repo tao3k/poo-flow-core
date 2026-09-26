@@ -6,12 +6,12 @@
 (import (only-in :std/test test-suite test-case check-equal?)
         (only-in :clan/poo/object .o .ref)
         (only-in :clan/poo/mop define-type element?)
-        (only-in :poo-flow/src/module-system/types
+        (only-in :poo-flow-foundation/module-system/types
                  PooFlowNativeObjectContract.
                  poo-flow-predicate-contract
                  poo-flow-contract-admit
                  poo-flow-validation-evidence-accepted?)
-        (only-in :poo-flow/src/module-system/object-family/syntax
+        (only-in :poo-flow-foundation/module-system/object-family/syntax
                  defpoo-object-family))
 (export foundation-test)
 
