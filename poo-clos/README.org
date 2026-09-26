@@ -71,8 +71,9 @@ evaluator.
 =mop.ss= is only a checked read-only CLOS capability profile, not a second
 MOP dispatch engine.  Native prototype C4 remains the sole precedence owner.
 
-The opt-in =just benchmark-dispatch= and =just benchmark-slot= receipts isolate
-multi-method selection from bound-slot access.  They are diagnostic, not
+The opt-in =just benchmark-dispatch=, =just benchmark-slot=, and
+=just benchmark-redefinition= receipts isolate multi-method selection,
+bound-slot access, and dependent-class layout propagation. They are diagnostic, not
 semantic admission gates: any runtime optimization must retain the Core CLOS
 test suite and show an end-to-end call/Slot gain, not merely improve one inner
 projection.  In particular, a per-call prototype-position index was rejected
