@@ -46,6 +46,14 @@
         subject: diagnostic-subject
         evidence: diagnostic-evidence)))
 
+(def (module-schema-merge-type-compatible? merge type)
+  (let (type-kind (and (poo-flow-module-value-type? type)
+                      (poo-flow-module-value-type-kind type)))
+    (cond
+     ((eq? merge 'node-extend) (eq? type-kind 'Node))
+     ((eq? merge 'node-remove) (eq? type-kind 'Symbol))
+     (else #t))))
+
 (def (module-schema-field-diagnostics field)
   (let* ((identity (poo-flow-module-field-contract-identity field))
          (type (poo-flow-module-field-contract-value-type field))
@@ -59,6 +67,10 @@
      (if (memq merge +module-schema-merge-kinds+)
        '()
        (list (module-schema-diagnostic 'unsupported-merge identity merge)))
+     (if (module-schema-merge-type-compatible? merge type)
+       '()
+       (list (module-schema-diagnostic 'merge-type-incompatible
+                                       identity merge)))
      (if (module-schema-metadata? metadata)
        '()
        (list (module-schema-diagnostic 'metadata-not-association-list
@@ -87,7 +99,10 @@
   (.ref validation 'valid))
 
 (def (module-schema-field-identities fields)
-  (map poo-flow-module-field-contract-identity fields))
+  (map (lambda (field)
+         (and (poo-flow-module-field-contract? field)
+              (poo-flow-module-field-contract-identity field)))
+       fields))
 
 (def (poo-flow-module-object-inheritance-chain schema-object)
   (map poo-flow-module-object-identity
@@ -134,7 +149,17 @@
 (def (module-schema-object-validation/uncached schema-object)
   (let* ((precedence (compute-precedence-list! schema-object))
          (direct-fields (poo-flow-module-object-fields schema-object))
-         (resolved-fields (poo-flow-module-object-resolved-fields schema-object))
+         (malformed-fields
+          (apply append
+                 (map (lambda (candidate)
+                        (filter (lambda (field)
+                                  (not (poo-flow-module-field-contract? field)))
+                                (poo-flow-module-object-fields candidate)))
+                      precedence)))
+         (resolved-fields
+          (if (null? malformed-fields)
+            (poo-flow-module-object-resolved-fields schema-object)
+            '()))
          (direct-identities (module-schema-field-identities direct-fields))
          (resolved-identities (module-schema-field-identities resolved-fields))
          (duplicates (module-schema-duplicate-identities resolved-identities))
@@ -149,6 +174,12 @@
          (object-metadata (poo-flow-module-object-metadata schema-object))
          (local-diagnostics
           (append
+           (map (lambda (field)
+                  (module-schema-diagnostic
+                   'invalid-field-contract
+                   (poo-flow-module-object-identity schema-object)
+                   field))
+                malformed-fields)
            (if (module-schema-metadata? object-metadata)
              '()
              (list (module-schema-diagnostic
@@ -224,7 +255,9 @@
                                   validation)))
                           validations))
          (identities (map (lambda (validation) (.ref validation 'object))
-                          validations)))
+                          validations))
+         (duplicate-object-ids
+          (module-schema-duplicate-identities identities)))
     (.o kind: "core.module-schema.catalog-validation"
         schema: poo-flow-module-object-validation-schema
         object-count: (length validations)
@@ -232,6 +265,8 @@
         invalid-count: (length invalid)
         invalid-objects:
         (map (lambda (validation) (.ref validation 'object)) invalid)
+        duplicate-identities: duplicate-object-ids
+        duplicate-count: (length duplicate-object-ids)
         inheritance-counts:
         (map (lambda (validation) (.ref validation 'inherit-count)) validations)
         inheritance-chains:
@@ -240,7 +275,7 @@
         (map (lambda (validation) (.ref validation 'field-origins)) validations)
         validation-phases:
         (map (lambda (validation) (.ref validation 'validationPhases)) validations)
-        valid: (null? invalid)
+        valid: (and (null? invalid) (null? duplicate-object-ids))
         checkedSignals: '(native-poo-catalog-validation)
         descriptor-realized?: #f
         runtime-executed: #f)))
@@ -252,5 +287,9 @@
       (error "module schema validation failed" validation))))
 
 (def (poo-flow-require-module-objects-validation! objects)
-  (for-each poo-flow-require-module-object-validation! objects)
-  objects)
+  (let (summary
+        (poo-flow-module-objects-validation-summary
+         (poo-flow-module-objects-validation objects)))
+    (if (.ref summary 'valid)
+      objects
+      (error "module schema catalog validation failed" summary))))

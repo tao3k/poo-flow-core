@@ -65,4 +65,46 @@
         (check-equal? (map (lambda (diagnostic) (.ref diagnostic 'code))
                            (.ref field-validation 'diagnostics))
                       '(unsupported-merge metadata-not-association-list
-                        default-not-in-native-type))))))
+                        default-not-in-native-type))))
+
+    (poo-flow-test-case "rejects merge operations incompatible with native types"
+      (let* ((bad
+              (poo-flow-module-object
+               'schema.bad-merge '()
+               (list (schema-field 'node PooFlowModuleStringType
+                                   'node-extend #f '())
+                     (schema-field 'target PooFlowModuleStringType
+                                   'node-remove #f '()))
+               '()))
+             (validation (poo-flow-module-object-validation bad)))
+        (check-equal? (poo-flow-module-object-validation-valid? validation) #f)
+        (check-equal? (map (lambda (diagnostic) (.ref diagnostic 'code))
+                           (.ref validation 'diagnostics))
+                      '(merge-type-incompatible merge-type-incompatible))))
+
+    (poo-flow-test-case "returns diagnostics for malformed field entries"
+      (let* ((bad (poo-flow-module-object
+                   'schema.bad-field '() '(not-a-contract) '()))
+             (validation (poo-flow-module-object-validation bad)))
+        (check-equal? (poo-flow-module-object-validation-valid? validation) #f)
+        (check-equal? (map (lambda (diagnostic) (.ref diagnostic 'code))
+                           (.ref validation 'diagnostics))
+                      '(invalid-field-contract))))
+
+    (poo-flow-test-case "rejects duplicate catalog identities"
+      (let* ((first (poo-flow-module-object 'schema.duplicate '() '() '()))
+             (second (poo-flow-module-object 'schema.duplicate '() '() '()))
+             (summary (poo-flow-module-objects-validation-summary
+                       (poo-flow-module-objects-validation
+                        (list first second)))))
+        (check-equal? (.ref summary 'valid) #f)
+        (check-equal? (.ref summary 'duplicate-identities)
+                      '(schema.duplicate))
+        (check-equal?
+         (with-catch
+          (lambda (_) #t)
+          (lambda ()
+            (poo-flow-require-module-objects-validation!
+             (list first second))
+            #f))
+         #t)))))
