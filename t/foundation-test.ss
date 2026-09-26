@@ -16,7 +16,13 @@
         (only-in :poo-flow-foundation/module-system/composition/lineage
                  poo-flow-lineage-analysis
                  poo-flow-lineage-cycle?
-                 poo-flow-productive-recursion?))
+                 poo-flow-productive-recursion?)
+        (only-in :poo-flow-foundation/module-system/observability/debug
+                 poo-flow-debug-memory-policy)
+        (only-in :poo-flow-foundation/module-system/observability/testing-case
+                 poo-flow-default-testing-case-profile
+                 poo-flow-testing-case-profile?
+                 poo-flow-test-case/with))
 (export foundation-test)
 
 (define-type (FoundationNameContract @ PooFlowNativeObjectContract.)
@@ -29,6 +35,16 @@
 (defpoo-object-family
   (accessors (foundation-name name))
   (projections (foundation->alist (name name))))
+
+(def +foundation-case-profile+
+  (.o (:: @ poo-flow-default-testing-case-profile)
+      (identity 'foundation/qualification)
+      (memory-policy
+       (poo-flow-debug-memory-policy
+        'foundation/qualification heap-limit-bytes: 1073741824
+        live-growth-limit-bytes: 536870912
+        sample-interval-milliseconds: 10))
+      (max-duration-milliseconds 2000)))
 
 (def foundation-test
   (test-suite "POO Flow Foundation"
@@ -54,4 +70,10 @@
       (check-equal? (.ref (poo-flow-lineage-analysis '(a b a) '(b)) 'status)
                     'productive-recursion)
       (check-equal? (.ref (poo-flow-lineage-analysis '(a b a) '(c)) 'status)
-                    'non-productive-cycle))))
+                    'non-productive-cycle))
+    (poo-flow-test-case/with +foundation-case-profile+
+      "Case profile extends Foundation memory and duration slots"
+      (check-equal? (poo-flow-testing-case-profile?
+                     +foundation-case-profile+) #t)
+      (check-equal? (.ref +foundation-case-profile+ 'identity)
+                    'foundation/qualification))))

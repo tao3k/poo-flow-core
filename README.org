@@ -19,6 +19,10 @@ contracts directly rather than attributing them to the full POO Flow package.
 Flow retains composition proof facts and module admission. Full POO Flow must
 not compile another copy of these module IDs.
 
+The =observability/testing-case= module owns the reusable POO Case profile and
+its native =std/test= adapter. Downstream packages extend =memory-policy= and
+=max-duration-milliseconds= slots instead of defining another Case wrapper.
+
 The Foundation Git revision is pinned by both gerbil-parser and POO Flow.
 POO Flow also carries this repository as a Git submodule for source inspection
 and coordinated development; =gxpkg= installs the package from its own URL.
