@@ -54,3 +54,7 @@ benchmark-slot:
 
 benchmark-effective-slots:
     env -u SDKROOT timeout --foreground --signal=TERM --kill-after=5s 120s gerbil {{ gerbil_test_runtime_options }} env gxi t/poo-clos-effective-slot-benchmark.ss
+
+# Dependent class redefinition includes native C4 preflight and live commit.
+benchmark-redefinition:
+    env -u SDKROOT timeout --foreground --signal=TERM --kill-after=5s 120s gerbil {{ gerbil_test_runtime_options }} env gxi t/poo-clos-redefinition-benchmark.ss
