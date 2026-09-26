@@ -3,6 +3,6 @@
 ;;; SPDX-License-Identifier: Apache-2.0 AND LGPL-2.1-or-later
 
 (package:
- poo-flow-foundation
+ core
  depend:
  ("github.com/tao3k/gerbil-poo@099b381588360a8a49fd772f666a1a00351366f5"))

@@ -1,4 +1,4 @@
-#+title: POO Flow Foundation
+#+title: Core
 
 * Purpose
 
@@ -7,15 +7,15 @@ modules shared by gerbil-parser and full POO Flow. It is a separate Gerbil
 package to keep the dependency graph acyclic:
 
 #+begin_example
-gerbil-poo → Foundation → gerbil-parser → POO Flow
-                       ↘ Orgize
+gerbil-poo → Core → gerbil-parser → POO Flow
+                 ↘ Orgize
 #+end_example
 
 * Module ownership
 
-The Gerbil module prefix is =poo-flow-foundation=. Consumers import its
+The Gerbil module prefix is =core=. Consumers import its
 contracts directly rather than attributing them to the full POO Flow package.
-=module-system/types.ss=, =object-family/=, =composition/lineage.ss=, and
+=types.ss=, =object-family/=, =composition/lineage.ss=, and
 =observability/= live here.  Lineage analysis is a pure shared kernel; POO
 Flow retains composition proof facts and module admission. Full POO Flow must
 not compile another copy of these module IDs.
@@ -24,11 +24,17 @@ The =observability/testing-case= module owns the reusable POO Case profile and
 its native =std/test= adapter. Downstream packages extend =memory-policy= and
 =max-duration-milliseconds= slots instead of defining another Case wrapper.
 
-Foundation depends only on =gerbil-poo= and Gerbil v0.19. Its memory sampler
+Core depends only on =gerbil-poo= and Gerbil v0.19. Its memory sampler
 reads Gambit process statistics locally; the Case profile does not import an
-ASP testing policy. POO Flow carries Foundation as a Git submodule and builds
+ASP testing policy. POO Flow carries Core as a Git submodule and builds
 it before its own modules; it does not declare the submodule again in
 =gerbil.pkg=.
+
+The package root is also the module root. No =src/= or =module-system/=
+container is needed inside Core: the top-level directories are the public
+Gerbil module namespaces. Full POO Flow keeps its own =src/module-system/=
+for assembly, loading, profiles, and admission rather than duplicating those
+mechanisms here.
 
 * Build and test
 
