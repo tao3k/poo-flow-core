@@ -29,6 +29,7 @@
     "composition/lineage"
     "observability/types"
     "observability/funcs"
+    "observability/objects"
     "observability/slot-debug"
     "observability/slot-presentation"
     "observability/debug"
