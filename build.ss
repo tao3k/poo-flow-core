@@ -36,6 +36,7 @@
     "module-system/funs"
     "module-system/loader/objects"
     "module-system/catalog/objects"
+    "module-system/projection/option-objects"
     "composition/lineage"
     "observability/types"
     "observability/funcs"
