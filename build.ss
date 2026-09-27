@@ -32,6 +32,7 @@
     "module-interface/objects"
     "module-graph/closure"
     "module-source/objects"
+    "module-context/queries"
     "composition/lineage"
     "observability/types"
     "observability/funcs"
