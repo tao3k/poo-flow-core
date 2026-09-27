@@ -24,6 +24,7 @@ a =gerbil.pkg= dependency.
 | =extension-graph/=, =composition/lineage.ss= | Extension fixed points and pure lineage analysis |
 | =contribution/= | Contribution values, capability admission, receipt issuance and revocation |
 | =module-system/= | Native Module values, schemas, inheritance, SourceRef, static Loader and Catalog |
+| =profile-composition/= | Indexed Module Profile selection and pure ProfileBundle composition |
 | =observability/= | Observations, feedback, slot presentation, memory sampling, testing Case |
 | =poo-clos/= | CLOS-specific metaprotocols over native POO objects and MOP |
 
