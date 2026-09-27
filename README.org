@@ -31,6 +31,12 @@ Generic identity, import, Profile, and capability relations live in
 own the native Module and
 authoring role Contracts; POO Flow supplies its role policy and default
 authoring Profile when it assembles a semantic Module.
+Semantic Module imports compose through native POO prototypes: C4 determines
+ancestor order and de-duplicates shared ancestors, while the =contributions=
+slot rule orders the local values before inherited values. A leaf retains its
+original imports object. This is ordinary configuration composition; explicit
+removal, conflict admission, and extension fixed points remain separately
+named policies rather than a second general-purpose merge evaluator.
 The generic =module-system/config.ss= owner maintains schema indexing, option policy
 values, and interface construction. POO Flow supplies product receipt kinds,
 brand identity, and its default authoring Profile.

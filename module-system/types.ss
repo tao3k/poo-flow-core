@@ -10,7 +10,8 @@
                  PooFlowContract. PooFlowNativeObjectContract.
                  poo-flow-classification-evidence)
         (only-in :core/module-system/schema/relations
-                 SemanticSymbol ModuleIdentityContract ModuleImportsContract
+                 SemanticSymbol SemanticImports.
+                 ModuleIdentityContract ModuleImportsContract
                  ModuleProfilesContract ModuleCapabilitiesContract))
 (export ModuleSourceRoleContract ModuleAuthoringProfileContract
         SemanticModuleContract)
@@ -90,7 +91,7 @@
 ;;; responsibility, including its role-indexed authoring Profile.
 (define-type (SemanticModuleContract @ PooFlowNativeObjectContract.)
   identity: 'semantic-module
-  proto: (semantic-empty-prototype)
+  proto: (.o imports: SemanticImports.)
   responsibilities:
   (.o identity: ModuleIdentityContract
       imports: ModuleImportsContract
