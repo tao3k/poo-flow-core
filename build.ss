@@ -17,6 +17,7 @@
     "extension-graph/support/operation"
     "extension-graph/support/apply"
     "extension-graph/interface"
+    "contribution/objects"
     "module-schema/support/contracts"
     "module-schema/support/merge"
     "module-schema/support/object-slots"

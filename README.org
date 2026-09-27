@@ -15,10 +15,13 @@ gerbil-poo → Core → gerbil-parser → POO Flow
 
 The Gerbil module prefix is =core=. Consumers import its
 contracts directly rather than attributing them to the full POO Flow package.
-=types.ss=, =object-family/=, =extension-graph/=, =module-schema/=,
+=types.ss=, =object-family/=, =extension-graph/=, =contribution/=, =module-schema/=,
 =composition/lineage.ss=, =observability/=, and =poo-clos/= live here.
 Extension-graph fixed-point operations and module-schema inheritance/field
 contracts are shared POO mechanisms, not POO Flow Loader policies.
+The pure =contribution/objects.ss= factor owns POO contribution values and
+capability admission. POO Flow retains host-trusted verification, discovery,
+and activation; Core does not grant runtime authority.
 The reusable native slot Type and Contract descriptors live in
 =module-schema/slot-contracts.ss=; downstream product modules import this Core
 owner directly rather than defining another contract schema.
