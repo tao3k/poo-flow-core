@@ -6,7 +6,7 @@
 ;;; Boundary: public facade for module extension graph operations.
 
 (import :core/extension-graph/support/data
-        :core/extension-graph/support/merge
+        :core/extension-graph/support/node-operations
         :core/extension-graph/support/operation
         :core/extension-graph/support/apply)
 

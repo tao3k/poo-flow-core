@@ -10,7 +10,7 @@
                  .ref
                  object?)
         :core/extension-graph/support/data
-        :core/extension-graph/support/merge
+        :core/extension-graph/support/node-operations
         :core/extension-graph/support/operation)
 
 (export poo-flow-module-extension-apply-operations

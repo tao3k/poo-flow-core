@@ -17,7 +17,7 @@
                  $computed-slot-spec)
         :core/extension-graph/interface
         :core/module-system/schema/support/contracts
-        :core/module-system/schema/support/merge)
+        :core/module-system/schema/support/field-resolution)
 
 (import :core/module-system/schema/support/object-slots)
 
@@ -609,7 +609,8 @@
                                                        contributions))
     (if fast-result
       (poo-flow-module-config-merge-result fast-result contributions)
-      (poo-flow-module-config-mk-merge objects-node contributions))))
+      (poo-flow-module-field-contributions-resolve
+       objects-node contributions))))
 
 ;; : (-> [PooModuleObject] [PooModuleFieldContribution] PooModuleConfigMergeResult)
 (def (poo-flow-module-objects-mk-merge objects contributions)

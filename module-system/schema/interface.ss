@@ -6,7 +6,8 @@
 ;;; Boundary: public facade for module object contracts and object-aware wrappers.
 
 (import :core/module-system/schema/support/contracts
-        :core/module-system/schema/support/merge
+        :core/module-system/schema/support/slot-policy
+        :core/module-system/schema/support/field-resolution
         :core/module-system/schema/support/object)
 
 (export poo-flow-module-object-kind
@@ -45,6 +46,7 @@
         poo-flow-module-field-contribution-merge
         poo-flow-module-field-contribution->extension
         poo-flow-module-field-contributions->extensions
+        poo-flow-module-slot-apply-policy
         poo-flow-module-transformer-contract
         poo-flow-module-transformer-contract?
         poo-flow-module-transformer-contract-identity
@@ -61,7 +63,7 @@
         poo-flow-module-transformer-contract-diagnostics
         poo-flow-module-transformer-contract-valid?
         poo-flow-module-transformer-field-contribution
-        poo-flow-module-config-mk-merge
+        poo-flow-module-field-contributions-resolve
         poo-flow-module-config-merge-result?
         poo-flow-module-config-merge-result-extension-result
         poo-flow-module-config-merge-result-contributions
