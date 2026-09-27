@@ -24,10 +24,14 @@ The reusable native slot Type and Contract descriptors live in
 owner directly rather than defining another contract schema.
 Lineage analysis is a pure
 shared kernel; POO Flow retains composition proof facts and module admission.
-The POO-native CLOS runtime and its MOP adapter belong to Core; upstream
-=gerbil-poo= remains the object/MOP authority. POO Flow retains only its
-module declaration and Loader registration. Full POO Flow must not compile
-another copy of these module IDs.
+The POO CLOS runtime and its MOP adapter belong to Core. =gerbil-poo= owns
+the underlying object and MOP behavior; Core extends it without reimplementing
+that behavior. POO Flow's Loader and Profiles consume Core directly and do not
+declare a second CLOS module.
+
+=observability/slot-presentation.ss= reads effective slot values through
+=clan/poo/object= and adds only identity-bound source presentation. It does not
+evaluate slots independently or define another object model.
 
 The =observability/testing-case= module owns the reusable POO Case profile and
 its native =std/test= adapter. Downstream packages extend =memory-policy= and

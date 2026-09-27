@@ -28,6 +28,7 @@
     "observability/types"
     "observability/funcs"
     "observability/slot-debug"
+    "observability/slot-presentation"
     "observability/debug"
     "observability/testing-case"
     "poo-clos/types"
