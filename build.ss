@@ -39,6 +39,7 @@
     "module-system/catalog/objects"
     "module-system/projection/option-objects"
     "module-system/projection/option-validation"
+    "module-system/observability/diagnostics"
     "composition/lineage"
     "observability/types"
     "observability/funcs"
