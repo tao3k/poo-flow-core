@@ -38,6 +38,9 @@ declare a second CLOS module.
 =observability/slot-presentation.ss= reads effective slot values through
 =clan/poo/object= and adds only identity-bound source presentation. It does not
 evaluate slots independently or define another object model.
+The native observation and feedback Diagnostic/Receipt constructors live in
+=observability/objects.ss= beside their Core Types and pure functions. POO Flow
+retains source admission, build observation, and testing integration policies.
 
 The =observability/testing-case= module owns the reusable POO Case profile and
 its native =std/test= adapter. Downstream packages extend =memory-policy= and
