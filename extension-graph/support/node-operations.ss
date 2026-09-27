@@ -3,7 +3,7 @@
 ;;;
 ;;; SPDX-License-Identifier: Apache-2.0 AND LGPL-2.1-or-later
 
-;;; Boundary: extension node merge and operation application helpers.
+;;; Boundary: explicit extension-node slot and child operations.
 
 (import (only-in :clan/poo/object
                  .o

@@ -16,10 +16,10 @@
                  $constant-slot-spec-value
                  $computed-slot-spec)
         :core/extension-graph/interface
-        :core/module-schema/support/contracts
-        :core/module-schema/support/merge)
+        :core/module-system/schema/support/contracts
+        :core/module-system/schema/support/field-resolution)
 
-(import :core/module-schema/support/object-slots)
+(import :core/module-system/schema/support/object-slots)
 
 (export poo-flow-module-object
         poo-flow-module-object?
@@ -59,8 +59,8 @@
         poo-flow-module-objects-contributions-by-target
         poo-flow-module-objects-fast-extension-child-state
         poo-flow-module-objects-fast-extension-result
-        poo-flow-module-objects-mk-merge/node
-        poo-flow-module-objects-mk-merge)
+        poo-flow-module-objects-resolve-contributions/node
+        poo-flow-module-objects-resolve-contributions)
 
 ;;; Module objects are POO-side schemas. They can inherit fields, but they do
 ;;; not instantiate modules or evaluate user config.
@@ -574,8 +574,9 @@
       state
       (car children)))))
 
-;;; Fast extension result is valid only for the objects root; other roots fall
-;;; back to the generic fixed-point merge contract.
+;;; Fast extension result is valid only for contributions to direct children.
+;;; A root-targeted operation must run through the extension graph so it can
+;;; update root slots (or extend/remove children) before child contributions.
 ;; : (-> PooModuleExtensionNode [PooModuleFieldContribution] MaybePooModuleExtensionResult)
 (def (poo-flow-module-objects-fast-extension-result objects-node contributions)
   (and (equal? (poo-flow-module-extension-node-identity objects-node)
@@ -589,7 +590,8 @@
                 groups
                 (poo-flow-module-extension-node-children objects-node)
                 (cons '() #f))))
-         (and state
+         (and (not (hash-get groups poo-flow-module-objects-root-identity))
+              state
               (poo-flow-module-extension-result
                (poo-flow-module-extension-node
                 poo-flow-module-objects-root-identity
@@ -598,19 +600,21 @@
                (if (cdr state) 1 0)
                #t)))))
 
-;;; Merge-node entrypoint prefers the objects-root fast path and delegates to
-;;; the generic extension merge when the shape is outside that proven boundary.
-;; : (-> PooModuleExtensionNode [PooModuleFieldContribution] PooModuleConfigMergeResult)
-(def (poo-flow-module-objects-mk-merge/node objects-node contributions)
+;;; Object contribution resolution prefers the objects-root fast path and
+;;; delegates to the generic extension graph outside that proven boundary.
+;; : (-> PooModuleExtensionNode [PooModuleFieldContribution] PooModuleFieldResolutionResult)
+(def (poo-flow-module-objects-resolve-contributions/node
+      objects-node contributions)
   (let (fast-result
         (poo-flow-module-objects-fast-extension-result objects-node
                                                        contributions))
     (if fast-result
-      (poo-flow-module-config-merge-result fast-result contributions)
-      (poo-flow-module-config-mk-merge objects-node contributions))))
+      (poo-flow-module-field-resolution-result fast-result contributions)
+      (poo-flow-module-field-contributions-resolve
+       objects-node contributions))))
 
-;; : (-> [PooModuleObject] [PooModuleFieldContribution] PooModuleConfigMergeResult)
-(def (poo-flow-module-objects-mk-merge objects contributions)
-  (poo-flow-module-objects-mk-merge/node
+;; : (-> [PooModuleObject] [PooModuleFieldContribution] PooModuleFieldResolutionResult)
+(def (poo-flow-module-objects-resolve-contributions objects contributions)
+  (poo-flow-module-objects-resolve-contributions/node
    (poo-flow-module-objects-node objects)
    contributions))

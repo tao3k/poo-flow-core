@@ -5,15 +5,16 @@
 
 ;;; Boundary: public facade for module object contracts and object-aware wrappers.
 
-(import :core/module-schema/support/contracts
-        :core/module-schema/support/merge
-        :core/module-schema/support/object)
+(import :core/module-system/schema/support/contracts
+        :core/module-system/schema/support/slot-policy
+        :core/module-system/schema/support/field-resolution
+        :core/module-system/schema/support/object)
 
 (export poo-flow-module-object-kind
         poo-flow-module-field-contract-kind
         poo-flow-module-field-contribution-kind
         poo-flow-module-transformer-contract-kind
-        poo-flow-module-config-merge-result-kind
+        poo-flow-module-field-resolution-result-kind
         poo-flow-module-objects-root-identity
         PooFlowModuleAnyType
         PooFlowModuleListType
@@ -45,6 +46,7 @@
         poo-flow-module-field-contribution-merge
         poo-flow-module-field-contribution->extension
         poo-flow-module-field-contributions->extensions
+        poo-flow-module-slot-apply-policy
         poo-flow-module-transformer-contract
         poo-flow-module-transformer-contract?
         poo-flow-module-transformer-contract-identity
@@ -61,13 +63,13 @@
         poo-flow-module-transformer-contract-diagnostics
         poo-flow-module-transformer-contract-valid?
         poo-flow-module-transformer-field-contribution
-        poo-flow-module-config-mk-merge
-        poo-flow-module-config-merge-result?
-        poo-flow-module-config-merge-result-extension-result
-        poo-flow-module-config-merge-result-contributions
-        poo-flow-module-config-merge-result-root
-        poo-flow-module-config-merge-result-iterations
-        poo-flow-module-config-merge-result-stable?
+        poo-flow-module-field-contributions-resolve
+        poo-flow-module-field-resolution-result?
+        poo-flow-module-field-resolution-result-extension-result
+        poo-flow-module-field-resolution-result-contributions
+        poo-flow-module-field-resolution-result-root
+        poo-flow-module-field-resolution-result-iterations
+        poo-flow-module-field-resolution-result-stable?
         poo-flow-module-object
         poo-flow-module-object?
         poo-flow-module-object-identity
@@ -86,5 +88,5 @@
         poo-flow-module-objects-index
         poo-flow-module-objects-ref/index
         poo-flow-module-objects-ref
-        poo-flow-module-objects-mk-merge/node
-        poo-flow-module-objects-mk-merge)
+        poo-flow-module-objects-resolve-contributions/node
+        poo-flow-module-objects-resolve-contributions)

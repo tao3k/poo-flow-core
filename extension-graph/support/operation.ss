@@ -6,13 +6,13 @@
 
 ;;; Boundary: native POO extension-operation prototypes and dispatch.
 ;;; Each operation family owns application and batching behavior as slots;
-;;; graph merge helpers remain pure values in support/merge.ss.
+;;; graph node helpers remain pure values in support/node-operations.ss.
 
 (import :gerbil/core
         (only-in :clan/poo/object .mix .o .ref)
         (only-in :clan/poo/mop .defgeneric)
         :core/extension-graph/support/data
-        :core/extension-graph/support/merge)
+        :core/extension-graph/support/node-operations)
 
 (export poo-flow-module-extension-operation-prototype
         poo-flow-module-extension-slot-override-prototype

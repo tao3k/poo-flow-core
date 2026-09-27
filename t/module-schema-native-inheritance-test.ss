@@ -10,7 +10,8 @@
          (only-in :std/test
                  check-equal?
                  test-suite)
-        :core/module-schema/interface)
+        :core/module-system/schema/interface
+        :core/extension-graph/interface)
 
 (export module-object-native-inheritance-test)
 
@@ -71,4 +72,30 @@
                (lambda ()
                  (poo-flow-module-object-resolved-fields broken)
                  #f))))
-        (check-equal? (not (not failure)) #t)))))
+        (check-equal? (not (not failure)) #t)))
+    (poo-flow-test-case "root contributions leave the child-only fast path"
+      (let* ((child
+              (poo-flow-module-object
+               'object/child '() (list (symbol-field 'marker 'base)) '()))
+             (base (poo-flow-module-objects-node (list child)))
+             (contributions
+              (list
+               (poo-flow-module-field-contribution
+                'objects (symbol-field 'namespace 'objects) 'updated)
+               (poo-flow-module-field-contribution
+                'object/child (symbol-field 'marker 'base) 'changed)))
+             (result
+              (poo-flow-module-objects-resolve-contributions/node
+               base contributions))
+             (resolved (poo-flow-module-field-resolution-result-root result))
+             (resolved-child
+              (poo-flow-module-objects-ref resolved 'object/child)))
+        (check-equal?
+         (cdr (assoc 'namespace (poo-flow-module-extension-node-slots resolved)))
+         'updated)
+        (check-equal?
+         (cdr (assoc 'marker
+                     (poo-flow-module-extension-node-slots resolved-child)))
+         'changed)
+        (check-equal? (poo-flow-module-field-resolution-result-stable? result)
+                      #t)))))

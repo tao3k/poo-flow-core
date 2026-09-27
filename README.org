@@ -1,70 +1,73 @@
+# SPDX-FileCopyrightText: 2026 tao3k team and Contributors
+#
+# SPDX-License-Identifier: Apache-2.0 AND LGPL-2.1-or-later
+
 #+title: Core
 
-* Purpose
+* What Core owns
 
-This repository owns the minimal POO-native contracts and observability
-modules shared by gerbil-parser and full POO Flow. It is a separate Gerbil
-package to keep the dependency graph acyclic:
+Core is the =core= Gerbil package: reusable POO-native mechanisms shared by
+POO Flow, gerbil-parser, and other consumers. The package root is the module
+root, so consumers import a precise owner such as =:core/module-system/config=.
+There is no eager umbrella module or compatibility alias.
 
-#+begin_example
-gerbil-poo → Core → gerbil-parser → POO Flow
-                 ↘ Orgize
-#+end_example
+Core depends on Gerbil v0.19 and =gerbil-poo=; it does not depend on POO Flow,
+ASP Scheme, or a product runtime. POO Flow includes Core as a Git submodule and
+builds its sources before its own modules. It does not repeat that submodule as
+a =gerbil.pkg= dependency.
 
-* Module ownership
+* Responsibility map
 
-The Gerbil module prefix is =core=. Consumers import its
-contracts directly rather than attributing them to the full POO Flow package.
-=types.ss=, =object-family/=, =extension-graph/=, =contribution/=, =module-schema/=,
-=composition/lineage.ss=, =observability/=, and =poo-clos/= live here.
-Extension-graph fixed-point operations and module-schema inheritance/field
-contracts are shared POO mechanisms, not POO Flow Loader policies.
-The pure =contribution/objects.ss= factor owns POO contribution values and
-capability admission. POO Flow retains host-trusted verification, discovery,
-and activation; Core does not grant runtime authority.
-The reusable native slot Type and Contract descriptors live in
-=module-schema/slot-contracts.ss=; downstream product modules import this Core
-owner directly rather than defining another contract schema.
-Generic identity, import, Profile, and capability relations live in
-=module-schema/relations.ss=; POO Flow supplies authoring and admission policy
-when it assembles a semantic Module.
-Lineage analysis is a pure
-shared kernel; POO Flow retains composition proof facts and module admission.
-The POO CLOS runtime and its MOP adapter belong to Core. =gerbil-poo= owns
-the underlying object and MOP behavior; Core extends it without reimplementing
-that behavior. POO Flow's Loader and Profiles consume Core directly and do not
-declare a second CLOS module.
+| Area | Shared mechanism |
+|------+------------------|
+| =object-family/=, =types.ss= | POO object families and Types |
+| =extension-graph/=, =composition/lineage.ss= | Extension fixed points and pure lineage analysis |
+| =contribution/= | Contribution values, capability admission, receipt issuance and revocation |
+| =module-system/= | Native Module values, schemas, inheritance, SourceRef, static Loader and Catalog |
+| =profile-composition/= | Indexed Module Profile selection and pure ProfileBundle composition |
+| =observability/= | Observations, feedback, slot presentation, memory sampling, testing Case |
+| =poo-clos/= | CLOS-specific metaprotocols over native POO objects and MOP |
 
-=observability/slot-presentation.ss= reads effective slot values through
-=clan/poo/object= and adds only identity-bound source presentation. It does not
-evaluate slots independently or define another object model.
-The native observation and feedback Diagnostic/Receipt constructors live in
-=observability/objects.ss= beside their Core Types and pure functions. POO Flow
-retains source admission, build observation, and testing integration policies.
+Within =module-system/=, =types.ss= and =objects.ss= own values and Contracts;
+=funs.ss= and =graph/funs.ss= own pure operations; =config.ss= owns generic
+interface construction. The =schema/=, =source/=, =loader/=, and =catalog/=
+subdirectories separate their respective mechanisms. Consumers import these
+leaf owners directly.
 
-The =observability/testing-case= module owns the reusable POO Case profile and
-its native =std/test= adapter. Downstream packages extend =memory-policy= and
-=max-duration-milliseconds= slots instead of defining another Case wrapper.
+Semantic Module imports use native POO prototype composition. Gerbil POO's C4
+orders and de-duplicates ancestors; the =contributions= slot rule places local
+values before inherited values. Core does not add a general-purpose merge
+evaluator. Removal, conflict admission, and extension fixed points remain
+explicit, separately named policies.
 
-Core depends only on =gerbil-poo= and Gerbil v0.19. Its memory sampler
-reads Gambit process statistics locally; the Case profile does not import an
-ASP testing policy. POO Flow carries Core as a Git submodule and builds
-it before its own modules; it does not declare the submodule again in
-=gerbil.pkg=.
+The CLOS layer adds multiple dispatch, method combination, lifecycle, and
+other CLOS semantics absent from the base MOP. Object identity, slot lookup,
+Type validation, and C4 precedence remain owned by =gerbil-poo=. See
+[[file:poo-clos/README.org][the CLOS implementation notes]] for its API and conformance boundary.
 
-The package root is also the module root. No =src/= or =module-system/=
-container is needed inside Core: the top-level directories are the public
-Gerbil module namespaces. Full POO Flow keeps its own =src/module-system/=
-for assembly, loading, profiles, and admission rather than duplicating those
-mechanisms here. Core's CLOS semantic tests run in this package; POO Flow
-keeps the module selection and integration tests.
+* Boundary with POO Flow
+
+Core values are inert until a product owner admits or executes them. POO Flow
+owns its Module branding, default authoring Profile, Loader selection, source
+interpretation, Doctor presentation, Profiles, and runtime handoff. Core's
+contribution verification can issue or revoke a host-trusted receipt; it does
+not grant runtime authority or execute an effect.
+
+The remaining POO Flow =src/module-system/= is being separated by ownership:
+shared mechanisms move here, while product policy stays in POO Flow. A file's
+location during migration is not a second permanent implementation contract.
 
 * Build and test
 
-With Gerbil v0.19 and dependencies installed in an isolated =GERBIL_PATH=:
+Use Gerbil v0.19 with =gerbil-poo= available in an isolated =GERBIL_PATH=.
+The Just recipes set the build parallelism and heap-fence tests before module
+imports:
 
 #+begin_src sh
-gerbil deps --install
-gerbil build
+just build
 just test
+just test-file t/module-interface-test.ss
 #+end_src
+
+Core's =t/= tests cover shared semantics. POO Flow retains product selection
+and cross-package integration tests.

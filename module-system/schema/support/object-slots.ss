@@ -11,7 +11,7 @@
                  $constant-slot-spec?
                  .ref
                  object-slots)
-        :core/module-schema/support/contracts)
+        :core/module-system/schema/support/contracts)
 
 (export poo-flow-module-object-constant-slot
         +poo-flow-module-object-slot-missing+

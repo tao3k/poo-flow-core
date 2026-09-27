@@ -9,7 +9,7 @@
 (import :gerbil/core
         (only-in :clan/poo/object .o .ref object? compute-precedence-list!)
         (only-in :std/list/list foldl)
-        :core/module-schema/interface)
+        :core/module-system/schema/interface)
 
 (export poo-flow-module-object-validation-kind
         poo-flow-module-object-validation-schema

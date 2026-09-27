@@ -4,10 +4,10 @@
 ;;; SPDX-License-Identifier: Apache-2.0 AND LGPL-2.1-or-later
 
 (import (only-in :core/observability/testing-case poo-flow-test-case)
-        (only-in :clan/poo/object .o .ref)
+        (only-in :clan/poo/object .o .mix .ref)
         (only-in :clan/poo/mop element? validate TypeError?)
         (only-in :std/test test-suite check-equal? check-exception)
-        :core/module-schema/relations)
+        :core/module-system/schema/relations)
 (export module-schema-relations-test)
 
 (def module-schema-relations-test
@@ -36,4 +36,10 @@
         (check-equal? (element? ImportContributionContract contribution) #t)
         (check-equal? (eq? (.ref contribution 'target) target) #t)
         (check-equal? (element? ModuleImportsContract imports) #t)
-        (check-equal? (.ref imports 'contributions) (list contribution))))))
+        (check-equal? (.ref imports 'contributions) (list contribution))))
+    (poo-flow-test-case "C4 imports retain every distinct prototype contribution"
+      (let* ((base (poo-flow-module-imports 'base))
+             (left (.mix (poo-flow-module-imports 'left) base))
+             (right (.mix (poo-flow-module-imports 'right) base))
+             (combined (.mix left right)))
+        (check-equal? (.ref combined 'contributions) '(left right base))))))

@@ -6,8 +6,8 @@
 (import (only-in :clan/poo/object .ref object?)
         (only-in :std/test check-equal? test-suite)
         (only-in :core/observability/testing-case poo-flow-test-case)
-        :core/module-schema/interface
-        :core/module-schema/validation)
+        :core/module-system/schema/interface
+        :core/module-system/schema/validation)
 
 (export module-schema-validation-test)
 

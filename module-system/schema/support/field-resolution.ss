@@ -3,178 +3,61 @@
 ;;;
 ;;; SPDX-License-Identifier: Apache-2.0 AND LGPL-2.1-or-later
 
-;;; Boundary: config merge result and slot merge algorithms for module objects.
+;;; Boundary: ordered field-contribution resolution for module object graphs.
 
 (import :gerbil/core
         (only-in :clan/poo/object .o .ref)
         :core/extension-graph/interface
-        :core/module-schema/support/contracts)
+        :core/module-system/schema/support/contracts
+        :core/module-system/schema/support/slot-policy)
 
-(export poo-flow-module-config-merge-result
-        poo-flow-module-config-merge-result?
-        poo-flow-module-config-merge-result-extension-result
-        poo-flow-module-config-merge-result-contributions
-        poo-flow-module-config-merge-result-root
-        poo-flow-module-config-merge-result-iterations
-        poo-flow-module-config-merge-result-stable?
-        poo-flow-module-config-member?
-        poo-flow-module-config-value-index
-        poo-flow-module-config-append-distinct
-        poo-flow-module-config-append-distinct/indexed
-        poo-flow-module-config-remove-elements
-        poo-flow-module-config-list-value
-        poo-flow-module-config-slot-merge-action?
-        poo-flow-module-config-merged-slot-value
+(export poo-flow-module-field-resolution-result
+        poo-flow-module-field-resolution-result?
+        poo-flow-module-field-resolution-result-extension-result
+        poo-flow-module-field-resolution-result-contributions
+        poo-flow-module-field-resolution-result-root
+        poo-flow-module-field-resolution-result-iterations
+        poo-flow-module-field-resolution-result-stable?
         poo-flow-module-config-fast-slot-merge/in-order
         poo-flow-module-config-slot-key-hash-ref
         poo-flow-module-config-fast-slot-merge/sparse
         poo-flow-module-config-fast-slot-merge
         poo-flow-module-config-fast-extension-result
-        poo-flow-module-config-mk-merge)
+        poo-flow-module-field-contributions-resolve)
 
 
-;;; Config merge results preserve the original contributions so diagnostics can
+;;; Field resolution results preserve the original contributions so diagnostics can
 ;;; explain both the final graph and the inputs that produced it.
-;; : (-> PooModuleExtensionResult [PooModuleFieldContribution] PooModuleConfigMergeResult)
-(def (poo-flow-module-config-merge-result extension-result contributions)
+;; : (-> PooModuleExtensionResult [PooModuleFieldContribution] PooModuleFieldResolutionResult)
+(def (poo-flow-module-field-resolution-result extension-result contributions)
   (let ((extension-result-value extension-result)
         (contributions-value contributions))
-    (.o kind: poo-flow-module-config-merge-result-kind
+    (.o kind: poo-flow-module-field-resolution-result-kind
         extension-result: extension-result-value
         contributions: contributions-value)))
 
-;; : (-> PooModuleConfigMergeResultCandidate Boolean)
-(def (poo-flow-module-config-merge-result? value)
-  (poo-flow-module-object-kind? value poo-flow-module-config-merge-result-kind))
+;; : (-> PooModuleFieldResolutionResultCandidate Boolean)
+(def (poo-flow-module-field-resolution-result? value)
+  (poo-flow-module-object-kind? value poo-flow-module-field-resolution-result-kind))
 
-;; : (-> PooModuleConfigMergeResult PooModuleExtensionResult)
-(def (poo-flow-module-config-merge-result-extension-result result)
+;; : (-> PooModuleFieldResolutionResult PooModuleExtensionResult)
+(def (poo-flow-module-field-resolution-result-extension-result result)
   (.ref result 'extension-result))
-;; : (-> PooModuleConfigMergeResult [PooModuleFieldContribution])
-(def (poo-flow-module-config-merge-result-contributions result)
+;; : (-> PooModuleFieldResolutionResult [PooModuleFieldContribution])
+(def (poo-flow-module-field-resolution-result-contributions result)
   (.ref result 'contributions))
-;; : (-> PooModuleConfigMergeResult PooModuleExtensionNode)
-(def (poo-flow-module-config-merge-result-root result)
+;; : (-> PooModuleFieldResolutionResult PooModuleExtensionNode)
+(def (poo-flow-module-field-resolution-result-root result)
   (poo-flow-module-extension-result-root
-   (poo-flow-module-config-merge-result-extension-result result)))
-;; : (-> PooModuleConfigMergeResult Integer)
-(def (poo-flow-module-config-merge-result-iterations result)
+   (poo-flow-module-field-resolution-result-extension-result result)))
+;; : (-> PooModuleFieldResolutionResult Integer)
+(def (poo-flow-module-field-resolution-result-iterations result)
   (poo-flow-module-extension-result-iterations
-   (poo-flow-module-config-merge-result-extension-result result)))
-;; : (-> PooModuleConfigMergeResult Boolean)
-(def (poo-flow-module-config-merge-result-stable? result)
+   (poo-flow-module-field-resolution-result-extension-result result)))
+;; : (-> PooModuleFieldResolutionResult Boolean)
+(def (poo-flow-module-field-resolution-result-stable? result)
   (poo-flow-module-extension-result-stable?
-   (poo-flow-module-config-merge-result-extension-result result)))
-
-;; : (-> PooModuleSlotValue [PooModuleSlotValue] Boolean)
-(def (poo-flow-module-config-member? value values)
-  (and (member value values) #t))
-
-;;; Value indexes make append/remove membership checks O(1) per value and keep
-;;; list-order preservation separate from duplicate detection.
-;; : (-> [PooModuleSlotValue] HashTable)
-(def (poo-flow-module-config-value-index values)
-  (let (index (make-hash-table))
-    (for-each
-     (lambda (value)
-       (hash-put! index value #t))
-     values)
-    index))
-
-;;; Distinct append preserves the original base list and pays the hash-index
-;;; setup only when there is an extra list to merge.
-;; : (-> [PooModuleSlotValue] [PooModuleSlotValue] [PooModuleSlotValue])
-(def (poo-flow-module-config-append-distinct base extra)
-  (if (null? extra)
-    base
-    (poo-flow-module-config-append-distinct/indexed
-     base
-     extra
-     (poo-flow-module-config-value-index base))))
-
-;;; Indexed append is the inner hot path: it accumulates unseen values in
-;;; reverse and performs one ordered append after the scan.
-;; : (-> [PooModuleSlotValue] HashTable [PooModuleSlotValue] [PooModuleSlotValue])
-(def (poo-flow-module-config-append-distinct-added/rev extra seen added-rev)
-  (append
-   (reverse
-    (filter-map
-     (lambda (value)
-       (and (not (hash-get seen value))
-            (begin
-              (hash-put! seen value #t)
-              value)))
-     extra))
-   added-rev))
-
-;; : (-> [PooModuleSlotValue] [PooModuleSlotValue] HashTable [PooModuleSlotValue])
-(def (poo-flow-module-config-append-distinct/indexed base extra seen)
-  (let (added
-        (poo-flow-module-config-append-distinct-added/rev extra seen '()))
-    (if (null? added)
-      base
-      (append base (reverse added)))))
-
-;;; Removal mirrors append by indexing the removal set first, so kept values
-;;; preserve source order without repeated linear membership scans.
-;; : (-> [PooModuleSlotValue] HashTable [PooModuleSlotValue] [PooModuleSlotValue])
-(def (poo-flow-module-config-remove-elements/rev values removed-index kept-rev)
-  (cond
-   ((null? values) kept-rev)
-   ((hash-get removed-index (car values))
-    (poo-flow-module-config-remove-elements/rev
-     (cdr values)
-     removed-index
-     kept-rev))
-   (else
-    (poo-flow-module-config-remove-elements/rev
-     (cdr values)
-     removed-index
-     (cons (car values) kept-rev)))))
-
-;; : (-> [PooModuleSlotValue] [PooModuleSlotValue] [PooModuleSlotValue])
-(def (poo-flow-module-config-remove-elements values removed)
-  (if (null? removed)
-    values
-    (let (removed-index (poo-flow-module-config-value-index removed))
-      (filter (lambda (value)
-                (not (hash-get removed-index value)))
-              values))))
-
-;;; Slot merge operators accept scalar and list payloads; normalizing here keeps
-;;; append/prepend/remove semantics identical across user input shapes.
-;; : (-> PooModuleSlotValue [PooModuleSlotValue])
-(def (poo-flow-module-config-list-value value)
-  (cond ((null? value) '())
-        ((list? value) value)
-        (else (list value))))
-
-;; : (-> Symbol Boolean)
-(def (poo-flow-module-config-slot-merge-action? merge)
-  (or (eq? merge 'override)
-      (eq? merge 'append)
-      (eq? merge 'prepend)
-      (eq? merge 'remove)))
-
-;;; Merge dispatch is total: unknown actions leave the current slot unchanged,
-;;; while list-style actions normalize both sides before combining.
-;; : (-> Symbol PooModuleSlotValue PooModuleSlotValue PooModuleSlotValue)
-(def (poo-flow-module-config-merged-slot-value merge current value)
-  (cond
-   ((eq? merge 'override) value)
-   ((eq? merge 'append)
-    (poo-flow-module-config-append-distinct
-     (poo-flow-module-config-list-value current)
-     (poo-flow-module-config-list-value value)))
-   ((eq? merge 'prepend)
-    (poo-flow-module-config-append-distinct
-     (poo-flow-module-config-list-value value)
-     (poo-flow-module-config-list-value current)))
-   ((eq? merge 'remove)
-    (poo-flow-module-config-remove-elements
-     (poo-flow-module-config-list-value current)
-     (poo-flow-module-config-list-value value)))
-   (else current)))
+   (poo-flow-module-field-resolution-result-extension-result result)))
 
 ;; poo-flow-module-config-fast-slot-merge/in-order
 ;;   : (-> Symbol PooModuleSlotMap [PooModuleFieldContribution] MaybePooModuleSlotMap)
@@ -248,7 +131,7 @@
                          value))))
               (if (and (equal? target node-identity)
                        valid?
-                       (poo-flow-module-config-slot-merge-action? merge)
+                       (poo-flow-module-slot-policy? merge)
                        (equal? key slot-key))
                 (if (hash-get seen slot-key)
                   #f
@@ -256,7 +139,7 @@
                     (hash-put! seen slot-key #t)
                     (let* ((current (cdr entry))
                            (next-value
-                            (poo-flow-module-config-merged-slot-value
+                            (poo-flow-module-slot-apply-policy
                              merge
                              current
                              value))
@@ -305,16 +188,16 @@
         (if index
           index
           (let (next-index
-                (poo-flow-module-config-value-index
-                 (poo-flow-module-config-list-value current)))
+                (poo-flow-module-slot-value-index
+                 (poo-flow-module-slot-list-value current)))
             (hash-put! value-indexes key next-index)
             next-index))))
     ;; : (-> Any Any)
     (def (record-slot-value-index! key value)
       (hash-put! value-indexes
                  key
-                 (poo-flow-module-config-value-index
-                  (poo-flow-module-config-list-value value))))
+                 (poo-flow-module-slot-value-index
+                  (poo-flow-module-slot-list-value value))))
     ;; : (-> Any Any)
     (def (materialize-append-state key)
       (let ((base (poo-flow-module-config-slot-key-hash-ref
@@ -342,8 +225,8 @@
         (poo-flow-module-config-slot-key-hash-ref updates key)))
     ;; : (-> Any Any)
     (def (append-slot-value! key current value)
-      (let ((current-list (poo-flow-module-config-list-value current))
-            (extra (poo-flow-module-config-list-value value))
+      (let ((current-list (poo-flow-module-slot-list-value current))
+            (extra (poo-flow-module-slot-list-value value))
             (active? (poo-flow-module-config-slot-key-hash-ref
                       append-active
                       key)))
@@ -426,7 +309,7 @@
                     (poo-flow-module-field-contribution-merge contribution)))
               (if (and (equal? target node-identity)
                        valid?
-                       (poo-flow-module-config-slot-merge-action? merge))
+                       (poo-flow-module-slot-policy? merge))
                 (let* ((entry (poo-flow-module-config-slot-key-hash-ref
                                seen
                                key))
@@ -466,7 +349,7 @@
                                            next-new-order
                                            next-changed?))
                     (let* ((next-value
-                            (poo-flow-module-config-merged-slot-value
+                            (poo-flow-module-slot-apply-policy
                              merge
                              current
                              value))
@@ -522,9 +405,9 @@
           #f))
       #f)))
 
-;; : (-> PooModuleExtensionNode [PooModuleFieldContribution] PooModuleConfigMergeResult)
-(def (poo-flow-module-config-mk-merge base contributions)
-  (poo-flow-module-config-merge-result
+;; : (-> PooModuleExtensionNode [PooModuleFieldContribution] PooModuleFieldResolutionResult)
+(def (poo-flow-module-field-contributions-resolve base contributions)
+  (poo-flow-module-field-resolution-result
    (or (poo-flow-module-config-fast-extension-result base contributions)
        (poo-flow-module-extension-resolve
         base

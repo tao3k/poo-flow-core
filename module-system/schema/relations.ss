@@ -103,4 +103,11 @@
         source: source-value revision: revision-value target: target-value)))
 
 (def (poo-flow-module-imports . contribution-values)
-  (.o (:: @ SemanticImports.) contributions: contribution-values))
+  (.o (:: @ SemanticImports.)
+      (contributions => poo-flow-import-contributions-before
+                     contribution-values)))
+
+;;; C4 owns ancestry and diamond de-duplication; this slot rule only states
+;;; the domain-specific order within that ancestry.
+(def (poo-flow-import-contributions-before inherited local)
+  (append local inherited))
