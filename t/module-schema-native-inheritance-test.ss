@@ -85,7 +85,8 @@
                (poo-flow-module-field-contribution
                 'object/child (symbol-field 'marker 'base) 'changed)))
              (result
-              (poo-flow-module-objects-mk-merge/node base contributions))
+              (poo-flow-module-objects-resolve-contributions/node
+               base contributions))
              (resolved (poo-flow-module-config-merge-result-root result))
              (resolved-child
               (poo-flow-module-objects-ref resolved 'object/child)))

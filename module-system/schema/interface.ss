@@ -88,5 +88,5 @@
         poo-flow-module-objects-index
         poo-flow-module-objects-ref/index
         poo-flow-module-objects-ref
-        poo-flow-module-objects-mk-merge/node
-        poo-flow-module-objects-mk-merge)
+        poo-flow-module-objects-resolve-contributions/node
+        poo-flow-module-objects-resolve-contributions)

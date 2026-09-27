@@ -59,8 +59,8 @@
         poo-flow-module-objects-contributions-by-target
         poo-flow-module-objects-fast-extension-child-state
         poo-flow-module-objects-fast-extension-result
-        poo-flow-module-objects-mk-merge/node
-        poo-flow-module-objects-mk-merge)
+        poo-flow-module-objects-resolve-contributions/node
+        poo-flow-module-objects-resolve-contributions)
 
 ;;; Module objects are POO-side schemas. They can inherit fields, but they do
 ;;; not instantiate modules or evaluate user config.
@@ -603,7 +603,8 @@
 ;;; Merge-node entrypoint prefers the objects-root fast path and delegates to
 ;;; the generic extension merge when the shape is outside that proven boundary.
 ;; : (-> PooModuleExtensionNode [PooModuleFieldContribution] PooModuleConfigMergeResult)
-(def (poo-flow-module-objects-mk-merge/node objects-node contributions)
+(def (poo-flow-module-objects-resolve-contributions/node
+      objects-node contributions)
   (let (fast-result
         (poo-flow-module-objects-fast-extension-result objects-node
                                                        contributions))
@@ -613,7 +614,7 @@
        objects-node contributions))))
 
 ;; : (-> [PooModuleObject] [PooModuleFieldContribution] PooModuleConfigMergeResult)
-(def (poo-flow-module-objects-mk-merge objects contributions)
-  (poo-flow-module-objects-mk-merge/node
+(def (poo-flow-module-objects-resolve-contributions objects contributions)
+  (poo-flow-module-objects-resolve-contributions/node
    (poo-flow-module-objects-node objects)
    contributions))
