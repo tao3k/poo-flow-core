@@ -6,7 +6,7 @@
 (import (only-in :std/test test-suite check-equal?)
         (only-in :clan/poo/object .o .ref)
         (only-in :core/observability/testing-case poo-flow-test-case)
-        :core/module-graph/closure)
+        :core/module-system/graph/funs)
 
 (export module-graph-test)
 

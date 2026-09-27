@@ -10,7 +10,7 @@
          (only-in :std/test
                  check-equal?
                  test-suite)
-        :core/module-schema/interface)
+        :core/module-system/schema/interface)
 
 (export module-object-native-inheritance-test)
 

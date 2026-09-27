@@ -8,7 +8,7 @@
 (import :gerbil/core
         (only-in :clan/poo/object .o .ref)
         :core/extension-graph/interface
-        :core/module-schema/support/contracts)
+        :core/module-system/schema/support/contracts)
 
 (export poo-flow-module-config-merge-result
         poo-flow-module-config-merge-result?

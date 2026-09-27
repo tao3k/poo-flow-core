@@ -15,38 +15,37 @@ gerbil-poo → Core → gerbil-parser → POO Flow
 
 The Gerbil module prefix is =core=. Consumers import its
 contracts directly rather than attributing them to the full POO Flow package.
-=types.ss=, =object-family/=, =extension-graph/=, =contribution/=, =module-schema/=,
-=semantic-module/=, =module-interface/=, =module-graph/=, =module-source/=,
-=module-context/=, =module-catalog/=,
+=types.ss=, =object-family/=, =extension-graph/=, =contribution/=, =module-system/=,
 =composition/lineage.ss=, =observability/=, and =poo-clos/= live here.
-Extension-graph fixed-point operations and module-schema inheritance/field
+Extension-graph fixed-point operations and Module System inheritance/field
 contracts are shared POO mechanisms, not POO Flow Loader policies.
 The pure =contribution/objects.ss= factor owns POO contribution values and
 capability admission. =contribution/verification.ss= owns host-trusted receipt
 issuance and revocation without executing a product runtime. POO Flow retains
 discovery and activation; Core does not grant runtime authority.
 The reusable native slot Type and Contract descriptors live in
-=module-schema/slot-contracts.ss=; downstream product modules import this Core
+=module-system/schema/slot-contracts.ss=; downstream product modules import this Core
 owner directly rather than defining another contract schema.
 Generic identity, import, Profile, and capability relations live in
-=module-schema/relations.ss=. =semantic-module/= owns the native Module and
+=module-system/schema/relations.ss=. =module-system/types.ss= and =objects.ss=
+own the native Module and
 authoring role Contracts; POO Flow supplies its role policy and default
 authoring Profile when it assembles a semantic Module.
-The generic =module-interface/= owner maintains schema indexing, option policy
+The generic =module-system/config.ss= owner maintains schema indexing, option policy
 values, and interface construction. POO Flow supplies product receipt kinds,
 brand identity, and its default authoring Profile.
-=module-graph/closure.ss= owns ordered inline-Module closure and closed-world
+=module-system/graph/funs.ss= owns ordered inline-Module closure and closed-world
 missing-import findings. POO Flow supplies descriptor accessors and source
 interpretation; Core neither loads files nor activates Task/Flow registries.
-=module-source/objects.ss= owns inert SourceRef identity and inspection;
+=module-system/source/objects.ss= owns inert SourceRef identity and inspection;
 POO Flow retains source discovery, import syntax, and Loader selection.
-=module-context/queries.ss= reads native Module slots for phase, Hook, Flag,
+=module-system/funs.ss= reads native Module slots for phase, Hook, Flag,
 and stable depth order without loading sources. Product descriptor admission
 remains in POO Flow.
-=module-loader/backend.ss= owns generic static Backends, lazy selection values,
+=module-system/loader/objects.ss= owns generic static Backends, lazy selection values,
 forced-load receipts, and stable inspection. Product discovery and activation
 remain in POO Flow.
-=module-catalog/objects.ss= owns immutable ordered Catalog objects, pure
+=module-system/catalog/objects.ss= owns immutable ordered Catalog objects, pure
 SourceRef matching, and inspection. POO Flow retains typed missing-source
 failures, Doctor presentation, and Task/Flow activation.
 Lineage analysis is a pure
@@ -73,9 +72,14 @@ ASP testing policy. POO Flow carries Core as a Git submodule and builds
 it before its own modules; it does not declare the submodule again in
 =gerbil.pkg=.
 
-The package root is also the module root. No =src/= or =module-system/=
-container is needed inside Core: the top-level directories are the public
-Gerbil module namespaces. The remaining POO Flow =src/module-system/=
+The package root is also the module root. Generic Module System mechanisms
+are grouped under one =module-system/= namespace rather than spread across
+top-level =module-*= directories. Within that domain, =types= and =objects=
+define native values, =funs= and =graph/funs= provide pure operations,
+=config= owns interface construction, and =schema/=, =source/=, =loader/=,
+and =catalog/= retain bounded responsibilities. Consumers import the precise
+owner module; there is no eager umbrella import or compatibility alias.
+The remaining POO Flow =src/module-system/=
 implementation is being split into Core mechanisms and product adapters;
 it is not a second permanent owner. Core's semantic tests run here, while
 POO Flow keeps product selection and integration tests.

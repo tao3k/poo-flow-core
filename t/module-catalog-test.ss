@@ -6,8 +6,8 @@
 (import (only-in :std/test test-suite check-equal?)
         (only-in :clan/poo/object .o)
         (only-in :core/observability/testing-case poo-flow-test-case)
-        :core/module-source/objects
-        :core/module-catalog/objects)
+        :core/module-system/source/objects
+        :core/module-system/catalog/objects)
 
 (export module-catalog-test)
 

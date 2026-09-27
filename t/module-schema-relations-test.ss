@@ -7,7 +7,7 @@
         (only-in :clan/poo/object .o .ref)
         (only-in :clan/poo/mop element? validate TypeError?)
         (only-in :std/test test-suite check-equal? check-exception)
-        :core/module-schema/relations)
+        :core/module-system/schema/relations)
 (export module-schema-relations-test)
 
 (def module-schema-relations-test

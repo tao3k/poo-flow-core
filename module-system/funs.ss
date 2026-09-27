@@ -3,7 +3,7 @@
 ;;;
 ;;; SPDX-License-Identifier: Apache-2.0 AND LGPL-2.1-or-later
 
-;;; Pure queries over native Module slots. No source file is loaded and no
+;;; Pure Module System queries over native slots. No source file is loaded and no
 ;;; product-specific descriptor is admitted here.
 
 (import (only-in :clan/poo/object .ref))

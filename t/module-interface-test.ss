@@ -6,7 +6,7 @@
 (import (only-in :std/test test-suite check-equal?)
         (only-in :clan/poo/object .o .ref)
         (only-in :core/observability/testing-case poo-flow-test-case)
-        :core/module-interface/objects)
+        :core/module-system/config)
 
 (export module-interface-test)
 

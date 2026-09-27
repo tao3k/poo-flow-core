@@ -5,9 +5,9 @@
 
 ;;; Boundary: public facade for module object contracts and object-aware wrappers.
 
-(import :core/module-schema/support/contracts
-        :core/module-schema/support/merge
-        :core/module-schema/support/object)
+(import :core/module-system/schema/support/contracts
+        :core/module-system/schema/support/merge
+        :core/module-system/schema/support/object)
 
 (export poo-flow-module-object-kind
         poo-flow-module-field-contract-kind

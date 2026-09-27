@@ -3,11 +3,11 @@
 ;;;
 ;;; SPDX-License-Identifier: Apache-2.0 AND LGPL-2.1-or-later
 
-;;; Native Module Interface mechanism. Product identity and default policy are
+;;; Native Module System interface configuration. Product identity and policy are
 ;;; supplied by the caller; Core owns the schema index and option vocabulary.
 (import (only-in :clan/poo/object .all-slots .o .ref .slot? object?)
         (only-in :clan/poo/mop validate)
-        (only-in :core/semantic-module/types ModuleAuthoringProfileContract))
+        (only-in :core/module-system/types ModuleAuthoringProfileContract))
 
 (export poo-flow-module-kind=?
         poo-flow-module-object-ref/default

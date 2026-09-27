@@ -7,9 +7,9 @@
         (only-in :clan/poo/object .o .ref .cc)
         (only-in :clan/poo/mop element? validate TypeError?)
         (only-in :core/observability/testing-case poo-flow-test-case)
-        (only-in :core/module-schema/relations poo-flow-semantic-identity)
-        :core/semantic-module/types
-        :core/semantic-module/objects)
+        (only-in :core/module-system/schema/relations poo-flow-semantic-identity)
+        :core/module-system/types
+        :core/module-system/objects)
 
 (export module-system-semantic-test)
 

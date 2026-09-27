@@ -16,10 +16,10 @@
                  $constant-slot-spec-value
                  $computed-slot-spec)
         :core/extension-graph/interface
-        :core/module-schema/support/contracts
-        :core/module-schema/support/merge)
+        :core/module-system/schema/support/contracts
+        :core/module-system/schema/support/merge)
 
-(import :core/module-schema/support/object-slots)
+(import :core/module-system/schema/support/object-slots)
 
 (export poo-flow-module-object
         poo-flow-module-object?

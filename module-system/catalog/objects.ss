@@ -3,12 +3,12 @@
 ;;;
 ;;; SPDX-License-Identifier: Apache-2.0 AND LGPL-2.1-or-later
 
-;;; An immutable ordered Catalog of already-constructed POO Modules. Lookup
+;;; An immutable ordered Module Catalog of constructed POO Modules. Lookup
 ;;; observes SourceRef identity only; it never loads or activates a source.
 
 (import (only-in :clan/poo/object .ref)
         (only-in :core/object-family/syntax defpoo-object-family)
-        :core/module-source/objects)
+        :core/module-system/source/objects)
 
 (export poo-flow-module-catalog-entry-prototype
         make-poo-flow-module-catalog-entry

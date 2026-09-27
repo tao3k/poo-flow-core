@@ -3,13 +3,13 @@
 ;;;
 ;;; SPDX-License-Identifier: Apache-2.0 AND LGPL-2.1-or-later
 
-;;; Boundary: native semantic Module and authoring role contracts.
+;;; Boundary: native Module System types and authoring role contracts.
 (import (only-in :clan/poo/object .o object?)
         (only-in :clan/poo/mop define-type)
         (only-in :core/types
                  PooFlowContract. PooFlowNativeObjectContract.
                  poo-flow-classification-evidence)
-        (only-in :core/module-schema/relations
+        (only-in :core/module-system/schema/relations
                  SemanticSymbol ModuleIdentityContract ModuleImportsContract
                  ModuleProfilesContract ModuleCapabilitiesContract))
 (export ModuleSourceRoleContract ModuleAuthoringProfileContract

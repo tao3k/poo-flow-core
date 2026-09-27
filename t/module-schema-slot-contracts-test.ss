@@ -19,7 +19,7 @@
 (def module-schema-slot-contracts-test
   (test-suite "module-schema-slot-contracts-test"
     (poo-flow-test-case "validates the native contract"
-      (eval '(import "./module-schema/slot-contracts.ss"))
+      (eval '(import "./module-system/schema/slot-contracts.ss"))
       (eval '(import :clan/poo/object :clan/poo/mop))
       (contract-schema-eval
  '(begin

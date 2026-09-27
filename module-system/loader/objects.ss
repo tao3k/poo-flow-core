@@ -3,13 +3,13 @@
 ;;;
 ;;; SPDX-License-Identifier: Apache-2.0 AND LGPL-2.1-or-later
 
-;;; Boundary: generic Module loader Backend descriptors and lazy receipts.
+;;; Boundary: Module System Loader Backend objects and lazy receipts.
 ;;; Invariant: this owner returns data and never activates product modules.
 
 (import (only-in :clan/poo/object .ref)
         (only-in :core/object-family/syntax
                  defpoo-object-family)
-        :core/module-source/objects)
+        :core/module-system/source/objects)
 
 (export poo-flow-module-loader-entry-prototype
         make-poo-flow-module-loader-entry

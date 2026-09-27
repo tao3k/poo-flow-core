@@ -6,10 +6,10 @@
 ;;; Core owns the semantic Module value; a product supplies its authoring Profile.
 (import (only-in :clan/poo/object .o .ref)
         (only-in :clan/poo/mop validate)
-        (only-in :core/module-schema/relations
+        (only-in :core/module-system/schema/relations
                  poo-flow-empty-imports poo-flow-empty-capabilities
                  poo-flow-empty-profiles)
-        :core/semantic-module/types)
+        :core/module-system/types)
 
 (export SemanticModule. ModuleSourceRole. ModuleAuthoringProfile.
         make-semantic-module)
