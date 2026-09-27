@@ -38,6 +38,7 @@
     "poo-clos/lambda-list"
     "poo-clos/method-combination"
     "poo-clos/classes"
+    "poo-clos/model"
     "poo-clos/instance-state"
     "poo-clos/lifecycle"
     "poo-clos/dispatch"

@@ -6,6 +6,7 @@
 ;;; Public POO-native CLOS facade.  Syntax declarations are a later factor.
 
 (import "types.ss" "objects.ss" "funcs.ss" "generic-evolution.ss" "classes.ss"
+        "model.ss"
         "evolution.ss" "lifecycle.ss" "reflection.ss" "dispatch.ss"
         "load-form.ss" "mop.ss" "syntax.ss")
 
@@ -53,6 +54,8 @@
         poo-clos-class poo-clos-class-precedence-list
         poo-clos-find-class poo-clos-set-find-class! poo-clos-resolve-class
         poo-clos-class-effective-slots poo-clos-find-effective-slot
+        poo-clos-model-prototype poo-clos-model-validation-failure
+        poo-clos-model? poo-clos-check-model
         poo-clos-class-subclass?
         poo-clos-redefine-class poo-clos-make-instances-obsolete
         poo-clos-instance? poo-clos-class-of

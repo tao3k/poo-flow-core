@@ -51,6 +51,8 @@ The implementation provides:
 - two-phase =make-load-form= and =make-load-form-saving-slots= protocols with
   cycle-safe reference resolution, bound-slot preservation, and no initform
   replay.
+- =model.ss= validates ordinary POO values against effective CLOS instance-slot
+  metadata without creating lifecycle instances or repeating prototype ancestry.
 
 The public factor is =interface.ss=.  The functional kernel keeps an explicit
 POO invocation-frame API for low-level construction, while ordinary
