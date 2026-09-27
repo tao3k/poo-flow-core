@@ -34,6 +34,7 @@
     "module-source/objects"
     "module-context/queries"
     "module-loader/backend"
+    "module-catalog/objects"
     "composition/lineage"
     "observability/types"
     "observability/funcs"
