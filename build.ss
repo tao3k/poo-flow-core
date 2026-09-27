@@ -23,6 +23,7 @@
     "module-schema/support/object"
     "module-schema/interface"
     "module-schema/slot-contracts"
+    "module-schema/relations"
     "module-schema/validation"
     "composition/lineage"
     "observability/types"
