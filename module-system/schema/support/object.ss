@@ -574,8 +574,9 @@
       state
       (car children)))))
 
-;;; Fast extension result is valid only for the objects root; other roots fall
-;;; back to the generic fixed-point merge contract.
+;;; Fast extension result is valid only for contributions to direct children.
+;;; A root-targeted operation must run through the extension graph so it can
+;;; update root slots (or extend/remove children) before child contributions.
 ;; : (-> PooModuleExtensionNode [PooModuleFieldContribution] MaybePooModuleExtensionResult)
 (def (poo-flow-module-objects-fast-extension-result objects-node contributions)
   (and (equal? (poo-flow-module-extension-node-identity objects-node)
@@ -589,7 +590,8 @@
                 groups
                 (poo-flow-module-extension-node-children objects-node)
                 (cons '() #f))))
-         (and state
+         (and (not (hash-get groups poo-flow-module-objects-root-identity))
+              state
               (poo-flow-module-extension-result
                (poo-flow-module-extension-node
                 poo-flow-module-objects-root-identity
