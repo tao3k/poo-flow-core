@@ -6,7 +6,8 @@
 (import (only-in :std/test check-equal? test-suite)
         (only-in :clan/poo/object .ref object?)
         :core/observability/testing-case
-        :core/module-system/projection/option-objects)
+        :core/module-system/projection/option-objects
+        :core/module-system/projection/option-validation)
 
 (export module-option-objects-test)
 
@@ -28,4 +29,28 @@
         (check-equal? (poo-flow-module-option-schema? schema) #t)
         (check-equal? (poo-flow-module-option-schema-rule schema) 'constant)
         (check-equal? (poo-flow-module-option-validation-receipt? receipt) #t)
-        (check-equal? (.ref receipt 'valid?) #t)))))
+        (check-equal? (.ref receipt 'valid?) #t)))
+    (poo-flow-test-case "pure validation preserves order and typed outcomes"
+      (let* ((schema
+              (make-poo-flow-module-option-schema
+               "enabled" 'module-a 'Boolean 'constant #t '()))
+             (matched
+              (make-poo-flow-module-option-config
+               "enabled" #t 'module-a '()))
+             (mismatched
+              (make-poo-flow-module-option-config
+               "enabled" #f 'module-a '()))
+             (missing
+              (make-poo-flow-module-option-config
+               "absent" 1 'module-a '()))
+             (receipts
+              (poo-flow-module-options-validate
+               (lambda (id) (poo-flow-module-find-schema (list schema) id))
+               (list matched mismatched missing))))
+        (check-equal? (length receipts) 3)
+        (check-equal?
+         (map poo-flow-module-option-validation-receipt-code receipts)
+         '(ok constant-mismatch missing-schema))
+        (check-equal?
+         (map poo-flow-module-option-validation-receipt-valid? receipts)
+         '(#t #f #f))))))

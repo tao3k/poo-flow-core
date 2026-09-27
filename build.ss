@@ -37,6 +37,7 @@
     "module-system/loader/objects"
     "module-system/catalog/objects"
     "module-system/projection/option-objects"
+    "module-system/projection/option-validation"
     "composition/lineage"
     "observability/types"
     "observability/funcs"
