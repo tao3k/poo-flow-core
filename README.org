@@ -43,6 +43,9 @@ POO Flow retains source discovery, import syntax, and Loader selection.
 =module-context/queries.ss= reads native Module slots for phase, Hook, Flag,
 and stable depth order without loading sources. Product descriptor admission
 remains in POO Flow.
+=module-loader/backend.ss= owns generic static Backends, lazy selection values,
+forced-load receipts, and stable inspection. Product discovery and activation
+remain in POO Flow.
 Lineage analysis is a pure
 shared kernel; POO Flow retains composition proof facts and module admission.
 The POO CLOS runtime and its MOP adapter belong to Core. =gerbil-poo= owns
