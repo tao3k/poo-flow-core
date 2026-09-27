@@ -32,7 +32,7 @@ test-file path:
 test:
     #!/usr/bin/env bash
     set -euo pipefail
-    files=(t/core-test.ss t/poo-clos-*-test.ss t/extension-graph-*-test.ss t/contribution-*-test.ss t/module-schema-*-test.ss t/module-interface-test.ss t/module-graph-test.ss t/module-source-test.ss t/module-context-test.ss t/module-loader-backend-test.ss t/module-catalog-test.ss t/semantic-module-test.ss t/observability-*-test.ss t/slot-presentation-test.ss)
+    files=(t/core-test.ss t/poo-clos-*-test.ss t/extension-graph-*-test.ss t/contribution-*-test.ss t/module-schema-*-test.ss t/module-option-objects-test.ss t/module-interface-test.ss t/module-graph-test.ss t/module-source-test.ss t/module-context-test.ss t/module-loader-backend-test.ss t/module-catalog-test.ss t/semantic-module-test.ss t/observability-*-test.ss t/slot-presentation-test.ss)
     log="$(mktemp)"
     trap 'rm -f "$log"' EXIT
     env -u SDKROOT timeout --foreground --signal=TERM --kill-after=5s 120s gerbil {{ gerbil_test_runtime_options }} env gxtest "${files[@]}" 2>&1 | tee "$log"
