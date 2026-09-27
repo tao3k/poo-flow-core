@@ -26,7 +26,7 @@
         poo-flow-module-field-contract-kind
         poo-flow-module-field-contribution-kind
         poo-flow-module-transformer-contract-kind
-        poo-flow-module-config-merge-result-kind
+        poo-flow-module-field-resolution-result-kind
         poo-flow-module-objects-root-identity
         poo-flow-module-object-kind?
         poo-flow-module-alist?
@@ -96,9 +96,9 @@
 ;; : PooModuleTransformerContractKindId
 ;; | PooModuleTransformerContractKindId = String
 (def poo-flow-module-transformer-contract-kind "poo-flow.modules.transformer-contract.v1")
-;; : PooModuleConfigMergeResultKindId
-;; | PooModuleConfigMergeResultKindId = String
-(def poo-flow-module-config-merge-result-kind "poo-flow.modules.config-merge-result.v1")
+;; : PooModuleFieldResolutionResultKindId
+;; | PooModuleFieldResolutionResultKindId = String
+(def poo-flow-module-field-resolution-result-kind "poo-flow.modules.field-resolution-result.v1")
 ;; : PooModuleObjectsRootIdentity
 ;; | PooModuleObjectsRootIdentity = Symbol
 (def poo-flow-module-objects-root-identity 'objects)

@@ -600,20 +600,20 @@
                (if (cdr state) 1 0)
                #t)))))
 
-;;; Merge-node entrypoint prefers the objects-root fast path and delegates to
-;;; the generic extension merge when the shape is outside that proven boundary.
-;; : (-> PooModuleExtensionNode [PooModuleFieldContribution] PooModuleConfigMergeResult)
+;;; Object contribution resolution prefers the objects-root fast path and
+;;; delegates to the generic extension graph outside that proven boundary.
+;; : (-> PooModuleExtensionNode [PooModuleFieldContribution] PooModuleFieldResolutionResult)
 (def (poo-flow-module-objects-resolve-contributions/node
       objects-node contributions)
   (let (fast-result
         (poo-flow-module-objects-fast-extension-result objects-node
                                                        contributions))
     (if fast-result
-      (poo-flow-module-config-merge-result fast-result contributions)
+      (poo-flow-module-field-resolution-result fast-result contributions)
       (poo-flow-module-field-contributions-resolve
        objects-node contributions))))
 
-;; : (-> [PooModuleObject] [PooModuleFieldContribution] PooModuleConfigMergeResult)
+;; : (-> [PooModuleObject] [PooModuleFieldContribution] PooModuleFieldResolutionResult)
 (def (poo-flow-module-objects-resolve-contributions objects contributions)
   (poo-flow-module-objects-resolve-contributions/node
    (poo-flow-module-objects-node objects)

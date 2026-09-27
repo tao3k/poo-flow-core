@@ -87,7 +87,7 @@
              (result
               (poo-flow-module-objects-resolve-contributions/node
                base contributions))
-             (resolved (poo-flow-module-config-merge-result-root result))
+             (resolved (poo-flow-module-field-resolution-result-root result))
              (resolved-child
               (poo-flow-module-objects-ref resolved 'object/child)))
         (check-equal?
@@ -97,5 +97,5 @@
          (cdr (assoc 'marker
                      (poo-flow-module-extension-node-slots resolved-child)))
          'changed)
-        (check-equal? (poo-flow-module-config-merge-result-stable? result)
+        (check-equal? (poo-flow-module-field-resolution-result-stable? result)
                       #t)))))

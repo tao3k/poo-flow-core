@@ -14,7 +14,7 @@
         poo-flow-module-field-contract-kind
         poo-flow-module-field-contribution-kind
         poo-flow-module-transformer-contract-kind
-        poo-flow-module-config-merge-result-kind
+        poo-flow-module-field-resolution-result-kind
         poo-flow-module-objects-root-identity
         PooFlowModuleAnyType
         PooFlowModuleListType
@@ -64,12 +64,12 @@
         poo-flow-module-transformer-contract-valid?
         poo-flow-module-transformer-field-contribution
         poo-flow-module-field-contributions-resolve
-        poo-flow-module-config-merge-result?
-        poo-flow-module-config-merge-result-extension-result
-        poo-flow-module-config-merge-result-contributions
-        poo-flow-module-config-merge-result-root
-        poo-flow-module-config-merge-result-iterations
-        poo-flow-module-config-merge-result-stable?
+        poo-flow-module-field-resolution-result?
+        poo-flow-module-field-resolution-result-extension-result
+        poo-flow-module-field-resolution-result-contributions
+        poo-flow-module-field-resolution-result-root
+        poo-flow-module-field-resolution-result-iterations
+        poo-flow-module-field-resolution-result-stable?
         poo-flow-module-object
         poo-flow-module-object?
         poo-flow-module-object-identity

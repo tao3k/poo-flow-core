@@ -11,13 +11,13 @@
         :core/module-system/schema/support/contracts
         :core/module-system/schema/support/slot-policy)
 
-(export poo-flow-module-config-merge-result
-        poo-flow-module-config-merge-result?
-        poo-flow-module-config-merge-result-extension-result
-        poo-flow-module-config-merge-result-contributions
-        poo-flow-module-config-merge-result-root
-        poo-flow-module-config-merge-result-iterations
-        poo-flow-module-config-merge-result-stable?
+(export poo-flow-module-field-resolution-result
+        poo-flow-module-field-resolution-result?
+        poo-flow-module-field-resolution-result-extension-result
+        poo-flow-module-field-resolution-result-contributions
+        poo-flow-module-field-resolution-result-root
+        poo-flow-module-field-resolution-result-iterations
+        poo-flow-module-field-resolution-result-stable?
         poo-flow-module-config-fast-slot-merge/in-order
         poo-flow-module-config-slot-key-hash-ref
         poo-flow-module-config-fast-slot-merge/sparse
@@ -26,38 +26,38 @@
         poo-flow-module-field-contributions-resolve)
 
 
-;;; Config merge results preserve the original contributions so diagnostics can
+;;; Field resolution results preserve the original contributions so diagnostics can
 ;;; explain both the final graph and the inputs that produced it.
-;; : (-> PooModuleExtensionResult [PooModuleFieldContribution] PooModuleConfigMergeResult)
-(def (poo-flow-module-config-merge-result extension-result contributions)
+;; : (-> PooModuleExtensionResult [PooModuleFieldContribution] PooModuleFieldResolutionResult)
+(def (poo-flow-module-field-resolution-result extension-result contributions)
   (let ((extension-result-value extension-result)
         (contributions-value contributions))
-    (.o kind: poo-flow-module-config-merge-result-kind
+    (.o kind: poo-flow-module-field-resolution-result-kind
         extension-result: extension-result-value
         contributions: contributions-value)))
 
-;; : (-> PooModuleConfigMergeResultCandidate Boolean)
-(def (poo-flow-module-config-merge-result? value)
-  (poo-flow-module-object-kind? value poo-flow-module-config-merge-result-kind))
+;; : (-> PooModuleFieldResolutionResultCandidate Boolean)
+(def (poo-flow-module-field-resolution-result? value)
+  (poo-flow-module-object-kind? value poo-flow-module-field-resolution-result-kind))
 
-;; : (-> PooModuleConfigMergeResult PooModuleExtensionResult)
-(def (poo-flow-module-config-merge-result-extension-result result)
+;; : (-> PooModuleFieldResolutionResult PooModuleExtensionResult)
+(def (poo-flow-module-field-resolution-result-extension-result result)
   (.ref result 'extension-result))
-;; : (-> PooModuleConfigMergeResult [PooModuleFieldContribution])
-(def (poo-flow-module-config-merge-result-contributions result)
+;; : (-> PooModuleFieldResolutionResult [PooModuleFieldContribution])
+(def (poo-flow-module-field-resolution-result-contributions result)
   (.ref result 'contributions))
-;; : (-> PooModuleConfigMergeResult PooModuleExtensionNode)
-(def (poo-flow-module-config-merge-result-root result)
+;; : (-> PooModuleFieldResolutionResult PooModuleExtensionNode)
+(def (poo-flow-module-field-resolution-result-root result)
   (poo-flow-module-extension-result-root
-   (poo-flow-module-config-merge-result-extension-result result)))
-;; : (-> PooModuleConfigMergeResult Integer)
-(def (poo-flow-module-config-merge-result-iterations result)
+   (poo-flow-module-field-resolution-result-extension-result result)))
+;; : (-> PooModuleFieldResolutionResult Integer)
+(def (poo-flow-module-field-resolution-result-iterations result)
   (poo-flow-module-extension-result-iterations
-   (poo-flow-module-config-merge-result-extension-result result)))
-;; : (-> PooModuleConfigMergeResult Boolean)
-(def (poo-flow-module-config-merge-result-stable? result)
+   (poo-flow-module-field-resolution-result-extension-result result)))
+;; : (-> PooModuleFieldResolutionResult Boolean)
+(def (poo-flow-module-field-resolution-result-stable? result)
   (poo-flow-module-extension-result-stable?
-   (poo-flow-module-config-merge-result-extension-result result)))
+   (poo-flow-module-field-resolution-result-extension-result result)))
 
 ;; poo-flow-module-config-fast-slot-merge/in-order
 ;;   : (-> Symbol PooModuleSlotMap [PooModuleFieldContribution] MaybePooModuleSlotMap)
@@ -405,9 +405,9 @@
           #f))
       #f)))
 
-;; : (-> PooModuleExtensionNode [PooModuleFieldContribution] PooModuleConfigMergeResult)
+;; : (-> PooModuleExtensionNode [PooModuleFieldContribution] PooModuleFieldResolutionResult)
 (def (poo-flow-module-field-contributions-resolve base contributions)
-  (poo-flow-module-config-merge-result
+  (poo-flow-module-field-resolution-result
    (or (poo-flow-module-config-fast-extension-result base contributions)
        (poo-flow-module-extension-resolve
         base
