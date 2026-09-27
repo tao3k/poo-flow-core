@@ -29,6 +29,7 @@
     "module-schema/validation"
     "semantic-module/types"
     "semantic-module/objects"
+    "module-interface/objects"
     "composition/lineage"
     "observability/types"
     "observability/funcs"
