@@ -16,7 +16,7 @@ gerbil-poo → Core → gerbil-parser → POO Flow
 The Gerbil module prefix is =core=. Consumers import its
 contracts directly rather than attributing them to the full POO Flow package.
 =types.ss=, =object-family/=, =extension-graph/=, =contribution/=, =module-schema/=,
-=semantic-module/=, =module-interface/=, =module-graph/=,
+=semantic-module/=, =module-interface/=, =module-graph/=, =module-source/=,
 =composition/lineage.ss=, =observability/=, and =poo-clos/= live here.
 Extension-graph fixed-point operations and module-schema inheritance/field
 contracts are shared POO mechanisms, not POO Flow Loader policies.
@@ -37,6 +37,8 @@ brand identity, and its default authoring Profile.
 =module-graph/closure.ss= owns ordered inline-Module closure and closed-world
 missing-import findings. POO Flow supplies descriptor accessors and source
 interpretation; Core neither loads files nor activates Task/Flow registries.
+=module-source/objects.ss= owns inert SourceRef identity and inspection;
+POO Flow retains source discovery, import syntax, and Loader selection.
 Lineage analysis is a pure
 shared kernel; POO Flow retains composition proof facts and module admission.
 The POO CLOS runtime and its MOP adapter belong to Core. =gerbil-poo= owns

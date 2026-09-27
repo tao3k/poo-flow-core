@@ -31,6 +31,7 @@
     "semantic-module/objects"
     "module-interface/objects"
     "module-graph/closure"
+    "module-source/objects"
     "composition/lineage"
     "observability/types"
     "observability/funcs"
