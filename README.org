@@ -22,6 +22,9 @@ contracts are shared POO mechanisms, not POO Flow Loader policies.
 The reusable native slot Type and Contract descriptors live in
 =module-schema/slot-contracts.ss=; downstream product modules import this Core
 owner directly rather than defining another contract schema.
+Generic identity, import, Profile, and capability relations live in
+=module-schema/relations.ss=; POO Flow supplies authoring and admission policy
+when it assembles a semantic Module.
 Lineage analysis is a pure
 shared kernel; POO Flow retains composition proof facts and module admission.
 The POO CLOS runtime and its MOP adapter belong to Core. =gerbil-poo= owns
