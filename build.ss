@@ -35,6 +35,7 @@
     "module-system/source/objects"
     "module-system/funs"
     "module-system/loader/objects"
+    "module-system/loader/load-path"
     "module-system/catalog/objects"
     "module-system/projection/option-objects"
     "module-system/projection/option-validation"
