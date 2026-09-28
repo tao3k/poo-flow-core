@@ -9,7 +9,6 @@
         (only-in :clan/poo/object .call .o .ref .slot? object?)
         (only-in :core/observability/debug
                  poo-flow-debug-memory-policy
-                 poo-flow-debug-memory-policy?
                  call-with-poo-flow-debug-memory-case-watchdog))
 
 (export poo-flow-testing-case-profile-prototype
@@ -24,18 +23,14 @@
 ;;; not a claim of independent thread-local heap accounting.  Assertions stay
 ;;; on the native harness thread; a separate sampler may interrupt it.  The native
 ;;; worker's hard managed-heap cap is set by the Testing Interface.
-(def +poo-flow-default-case-memory-policy+
-  (poo-flow-debug-memory-policy
-   'testing/default-case
-   heap-limit-bytes:
-   1073741824
-   live-growth-limit-bytes: 536870912
-   sample-interval-milliseconds: 10))
-
 (def poo-flow-testing-case-profile-prototype
   (.o (testing-case-profile? #t)
       (identity 'testing/default-case)
-      (memory-policy +poo-flow-default-case-memory-policy+)
+      (heap-limit-bytes 1073741824)
+      (live-growth-limit-bytes 536870912)
+      (sample-interval-milliseconds 10)
+      (collect-before-sample? #f)
+      (fail-closed? #t)
       (max-duration-milliseconds 60000)
       (emit? #f)
       .run: (lambda (self description thunk)
@@ -46,7 +41,16 @@
               (unless (and (string? description) (procedure? thunk))
                 (error "invalid POO Flow testing Case" description thunk))
               (call-with-poo-flow-debug-memory-case-watchdog
-               (.ref self 'memory-policy)
+               (poo-flow-debug-memory-policy
+                (.ref self 'identity)
+                heap-limit-bytes: (.ref self 'heap-limit-bytes)
+                live-growth-limit-bytes:
+                (.ref self 'live-growth-limit-bytes)
+                sample-interval-milliseconds:
+                (.ref self 'sample-interval-milliseconds)
+                collect-before-sample?:
+                (.ref self 'collect-before-sample?)
+                fail-closed?: (.ref self 'fail-closed?))
                (string->symbol description)
                thunk
                emit?: (.ref self 'emit?)
@@ -62,10 +66,27 @@
    ((or (not (.slot? value 'identity))
         (not (symbol? (.ref value 'identity))))
     'invalid-identity)
-   ((or (not (.slot? value 'memory-policy))
-        (not (poo-flow-debug-memory-policy?
-              (.ref value 'memory-policy))))
-    'invalid-memory-policy)
+   ((.slot? value 'memory-policy)
+    'unexpected-memory-policy-slot)
+   ((or (not (.slot? value 'heap-limit-bytes))
+        (not (exact-integer? (.ref value 'heap-limit-bytes)))
+        (< (.ref value 'heap-limit-bytes) 0))
+    'invalid-heap-limit)
+   ((or (not (.slot? value 'live-growth-limit-bytes))
+        (not (exact-integer? (.ref value 'live-growth-limit-bytes)))
+        (< (.ref value 'live-growth-limit-bytes) 0))
+    'invalid-live-growth-limit)
+   ((or (not (.slot? value 'sample-interval-milliseconds))
+        (not (exact-integer?
+              (.ref value 'sample-interval-milliseconds)))
+        (<= (.ref value 'sample-interval-milliseconds) 0))
+    'invalid-sample-interval)
+   ((or (not (.slot? value 'collect-before-sample?))
+        (not (boolean? (.ref value 'collect-before-sample?))))
+    'invalid-collection)
+   ((or (not (.slot? value 'fail-closed?))
+        (not (boolean? (.ref value 'fail-closed?))))
+    'invalid-fail-closed)
    ((or (not (.slot? value 'max-duration-milliseconds))
         (not (exact-integer? (.ref value 'max-duration-milliseconds)))
         (<= (.ref value 'max-duration-milliseconds) 0))

@@ -4,7 +4,7 @@
 ;;; SPDX-License-Identifier: Apache-2.0 AND LGPL-2.1-or-later
 
 (import (only-in :std/test test-suite test-case check-equal?)
-        (only-in :clan/poo/object .o .ref)
+        (only-in :clan/poo/object .o .ref .call)
         (only-in :clan/poo/mop define-type element?)
         (only-in :core/types
                  PooFlowNativeObjectContract.
@@ -18,7 +18,7 @@
                  poo-flow-lineage-cycle?
                  poo-flow-productive-recursion?)
         (only-in :core/observability/debug
-                 poo-flow-debug-memory-policy
+                 PooFlowDebugMemoryAnomaly?
                  poo-flow-debug-memory-snapshot)
         (only-in :core/observability/testing-case
                  poo-flow-default-testing-case-profile
@@ -40,11 +40,6 @@
 (def +core-case-profile+
   (.o (:: @ poo-flow-default-testing-case-profile)
       (identity 'core/qualification)
-      (memory-policy
-       (poo-flow-debug-memory-policy
-        'core/qualification heap-limit-bytes: 1073741824
-        live-growth-limit-bytes: 536870912
-        sample-interval-milliseconds: 10))
       (max-duration-milliseconds 2000)))
 
 (def core-test
@@ -81,4 +76,29 @@
       (check-equal? (poo-flow-testing-case-profile?
                      +core-case-profile+) #t)
       (check-equal? (.ref +core-case-profile+ 'identity)
-                    'core/qualification))))
+                    'core/qualification))
+    (test-case "Core profile slots reject a zero-heap Case"
+      (let (bounded
+            (.o (:: @ +core-case-profile+)
+                (heap-limit-bytes 0)
+                (live-growth-limit-bytes 0)
+                (sample-interval-milliseconds 1)))
+        (check-equal? (poo-flow-testing-case-profile? bounded) #t)
+        (check-equal?
+         (poo-flow-testing-case-profile?
+          (.o (:: @ bounded) (heap-limit-bytes -1)))
+         #f)
+        (check-equal?
+         (poo-flow-testing-case-profile?
+          (.o (:: @ bounded) (memory-policy 'legacy)))
+         #f)
+        (check-equal?
+         (with-catch
+          PooFlowDebugMemoryAnomaly?
+          (lambda ()
+            (call-with-values
+             (lambda ()
+               (.call bounded .run bounded "zero-heap Core Case"
+                      (lambda () 'unexpected-admission)))
+             (lambda (value _receipt) value))))
+         #t)))))
