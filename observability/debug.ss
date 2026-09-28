@@ -252,8 +252,12 @@
     summary))
 
 ;;; This is the only runtime-heap read in the framework. Foundation projects
-;;; the five Gambit process-statistics counters directly into its own POO
-;;; sample; no benchmark or testing package owns this runtime boundary.
+;;; Gambit's process-statistics counters into its own POO sample; no benchmark
+;;; or testing package owns this runtime boundary. Some Gambit builds report
+;;; a negative cumulative allocation counter after sustained allocation.
+;;; Allocation is diagnostic only; heap size and live growth govern admission.
+;;; Project the unavailable allocation counter as zero to preserve the sample
+;;; contract and let the memory policy make its decision from valid counters.
 ;; : (-> Symbol collect?: Boolean PooFlowDebugMemorySample)
 ;; poo-flow-debug-memory-snapshot
 ;;   : (-> Symbol collect?: Boolean PooFlowDebugMemorySample)
@@ -272,10 +276,13 @@
 ;;     %
 (def (poo-flow-debug-memory-counters collect?)
   (when collect? (##gc))
-  (let (stats (##process-statistics))
-    (map (lambda (index)
-           (inexact->exact (f64vector-ref stats index)))
-         '(15 16 17 18 19))))
+  (let* ((stats (##process-statistics))
+         (allocated (inexact->exact (f64vector-ref stats 16))))
+    (list (inexact->exact (f64vector-ref stats 15))
+          (max 0 allocated)
+          (inexact->exact (f64vector-ref stats 17))
+          (inexact->exact (f64vector-ref stats 18))
+          (inexact->exact (f64vector-ref stats 19)))))
 
 (def (poo-flow-debug-memory-sample-from-counters phase counters)
     (apply (lambda (heap-size allocation live movable still)
