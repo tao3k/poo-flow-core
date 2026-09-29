@@ -8,7 +8,7 @@
 ;;; runtime manifests and proof rows are projections, not semantic owners.
 
 (import (only-in :clan/poo/object .def .o .ref object?)
-        (only-in :clan/poo/mop .defgeneric validate)
+        (only-in :clan/poo/mop-core .defgeneric validate)
         (only-in :core/types poo-flow-contract-admit)
         (only-in :core/object-family/syntax defpoo-object-family)
         :core/observability/funcs

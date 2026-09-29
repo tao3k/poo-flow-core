@@ -16,7 +16,7 @@
                  make-object
                  $constant-slot-spec
                  $computed-slot-spec)
-        (only-in :clan/poo/mop
+        (only-in :clan/poo/mop-core
                  .defgeneric Any Bool Object Type element? raise-type-error)
         (only-in :clan/poo/type List String Symbol)
         (only-in :core/types poo-flow-predicate-type)

@@ -10,7 +10,7 @@
 
 (import (only-in :clan/poo/object
                  .o .ref .slot? object? compute-precedence-list!)
-        (only-in :clan/poo/mop define-type Type. element?)
+        (only-in :clan/poo/mop-core define-type Type. element?)
 )
 
 (export ClosSpecializer ClosLambdaList ClosMethod ClosMethodBundle

@@ -15,7 +15,7 @@
                  .slot?
                  compute-precedence-list!
                  object?)
-        (only-in :clan/poo/mop
+        (only-in :clan/poo/mop-core
                  .defgeneric
                  define-type
                  Type

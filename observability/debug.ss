@@ -7,7 +7,7 @@
 ;;; Upstream owns tracing and typed printing. No global hook or tracer is copied.
 (import (only-in :clan/poo/support/base λ)
         (only-in :clan/poo/object .o .call .ref)
-        (only-in :clan/poo/mop validate)
+        (only-in :clan/poo/mop-core validate)
         (only-in :clan/poo/support/debug traced-function)
         (only-in :clan/poo/debug DDT trace-poo)
         :gerbil/runtime/gambit

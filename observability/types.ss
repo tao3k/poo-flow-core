@@ -9,7 +9,7 @@
 
 (import :gerbil/core
         (only-in :clan/poo/object .cc .mix .o .ref .slot? object? object<-alist)
-        (only-in :clan/poo/mop define-type element? validate)
+        (only-in :clan/poo/mop-core define-type element? validate)
         (only-in "../types.ss"
                  PooFlowContract.
                  PooFlowNativeObjectContract.

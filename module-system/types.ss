@@ -5,7 +5,7 @@
 
 ;;; Boundary: native Module System types and authoring role contracts.
 (import (only-in :clan/poo/object .o object?)
-        (only-in :clan/poo/mop define-type)
+        (only-in :clan/poo/mop-core define-type)
         (only-in :core/types
                  PooFlowContract. PooFlowNativeObjectContract.
                  poo-flow-classification-evidence)
