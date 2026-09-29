@@ -7,7 +7,7 @@
 
 (import (only-in :clan/poo/object
                  .o .ref .put! .slot? compute-precedence-list!)
-        (only-in :clan/poo/mop element?)
+        (only-in :clan/poo/mop-core element?)
         (only-in :std/hash/misc hash-ref/default hash-remove!)
         (only-in :std/list/list delete-duplicates/hash)
         (only-in :std/list/list find filter filter-map flatten1)

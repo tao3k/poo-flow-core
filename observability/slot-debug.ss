@@ -14,7 +14,7 @@
                  .putslot!
                  object?
                  $computed-slot-spec)
-        (only-in :clan/poo/mop validate)
+        (only-in :clan/poo/mop-core validate)
         (only-in :clan/poo/support/debug traced-function)
         (only-in :clan/poo/debug DDT)
         (only-in :std/error deferror-class)

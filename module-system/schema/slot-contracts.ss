@@ -7,7 +7,7 @@
 ;;; Invariant: schemas are ordinary POO values; alists exist only as receipts.
 
 (import (only-in :clan/poo/object .cc .o .ref)
-        (only-in :clan/poo/mop element? raise-type-error)
+        (only-in :clan/poo/mop-core element? raise-type-error)
         (only-in :std/list/list filter-map)
         (only-in :core/types
                  poo-flow-predicate-contract

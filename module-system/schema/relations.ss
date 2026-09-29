@@ -6,7 +6,7 @@
 ;;; Boundary: reusable POO module identity and directional contribution relations.
 ;;; Authoring roles and source-file policy belong to the consuming package.
 (import (only-in :clan/poo/object .o .mix .ref)
-        (only-in :clan/poo/mop define-type validate)
+        (only-in :clan/poo/mop-core define-type validate)
         (only-in :core/types
                  PooFlowContract. PooFlowNativeObjectContract.
                  poo-flow-classification-evidence))

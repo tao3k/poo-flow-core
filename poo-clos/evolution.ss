@@ -6,7 +6,7 @@
 ;;; Transaction-shaped class generation and dependent-class evolution.
 
 (import (only-in :clan/poo/object .ref)
-        (only-in :clan/poo/mop element?)
+        (only-in :clan/poo/mop-core element?)
         "types.ss" "objects.ss" "classes.ss")
 
 (export poo-clos-redefine-class poo-clos-make-instances-obsolete)

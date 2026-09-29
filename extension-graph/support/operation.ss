@@ -10,7 +10,7 @@
 
 (import :gerbil/core
         (only-in :clan/poo/object .mix .o .ref)
-        (only-in :clan/poo/mop .defgeneric)
+        (only-in :clan/poo/mop-core .defgeneric)
         :core/extension-graph/support/data
         :core/extension-graph/support/node-operations)
 

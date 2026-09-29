@@ -8,7 +8,7 @@
 ;;; neither discovers packages nor executes Runtime behavior.
 
 (import (only-in :clan/poo/object .all-slots .mix .o .ref .slot? object?)
-        (only-in :clan/poo/mop Type. define-type element? validate)
+        (only-in :clan/poo/mop-core Type. define-type element? validate)
         (only-in :std/error deferror-class)
         (only-in :std/list/list append-map delete-duplicates/hash every filter-map)
         (only-in :core/module-system/types

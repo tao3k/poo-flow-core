@@ -7,7 +7,7 @@
 
 (import (only-in :clan/poo/object
                  .ref .slot? object? compute-precedence-list!)
-        (only-in :clan/poo/mop element?)
+        (only-in :clan/poo/mop-core element?)
         (only-in :std/list/list drop filter-map find flatten1)
         "types.ss" "objects.ss" "classes.ss" "method-combination.ss"
         "funcs.ss")

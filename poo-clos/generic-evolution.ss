@@ -6,7 +6,7 @@
 ;;; Generic-function creation and binding-owned configuration evolution.
 
 (import (only-in :clan/poo/object .ref .put!)
-        (only-in :clan/poo/mop element?)
+        (only-in :clan/poo/mop-core element?)
         "types.ss" "objects.ss")
 
 (export poo-clos-ensure-generic-function

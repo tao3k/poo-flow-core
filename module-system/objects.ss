@@ -5,7 +5,7 @@
 
 ;;; Core owns the semantic Module value; a product supplies its authoring Profile.
 (import (only-in :clan/poo/object .o .mix .ref)
-        (only-in :clan/poo/mop validate)
+        (only-in :clan/poo/mop-core validate)
         (only-in :core/module-system/schema/relations
                  SemanticImports.
                  poo-flow-empty-imports poo-flow-empty-capabilities

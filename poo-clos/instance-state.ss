@@ -6,7 +6,7 @@
 ;;; POO-native CLOS instance state and generation migration values.
 
 (import (only-in :clan/poo/object .o .ref .put! .slot? object?)
-        (only-in :clan/poo/mop element?)
+        (only-in :clan/poo/mop-core element?)
         (only-in :std/hash/misc hash-ref/default)
         (only-in :std/list/list filter find foldl)
         "types.ss" "objects.ss" "classes.ss" "funcs.ss")

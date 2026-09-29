@@ -6,7 +6,7 @@
 ;;; Checked construction and identity-preserving generic-function evolution.
 
 (import (only-in :clan/poo/object .o .ref .put!)
-        (only-in :clan/poo/mop element?)
+        (only-in :clan/poo/mop-core element?)
         (only-in :std/hash/misc hash-ref/default)
         (only-in :std/list/list iota)
         "types.ss" "funcs.ss")

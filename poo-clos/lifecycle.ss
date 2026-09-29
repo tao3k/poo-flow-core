@@ -6,7 +6,7 @@
 ;;; Standard CLOS instance allocation, initialization, and slot access.
 
 (import (only-in :clan/poo/object .o .ref .slot? .put! object?)
-        (only-in :clan/poo/mop element?)
+        (only-in :clan/poo/mop-core element?)
         (only-in :std/hash/misc hash-ref/default)
         (only-in :std/list/list filter find)
         "types.ss" "objects.ss" "classes.ss" "dispatch.ss"

@@ -6,7 +6,7 @@
 ;;; Read-only class and instance reflection over POO metaobjects.
 
 (import (only-in :clan/poo/object .ref)
-        (only-in :clan/poo/mop element?)
+        (only-in :clan/poo/mop-core element?)
         (only-in :std/list/list find)
         "types.ss" "objects.ss" "classes.ss" "lifecycle.ss" "dispatch.ss")
 

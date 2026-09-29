@@ -6,7 +6,7 @@
 ;;; Boundary: pure bounded inspection of existing Contract evidence.
 ;;; Never re-evaluates the observed candidate, reads a clock, or prints a value.
 (import (only-in :clan/poo/object .o .ref .slot? object?)
-        (only-in :clan/poo/mop validate raise-type-error)
+        (only-in :clan/poo/mop-core validate raise-type-error)
         (only-in "../types.ss" PooFlowValidationEvidence)
         "types.ss")
 (export poo-flow-observation-admission-facts
